@@ -46,11 +46,11 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
         <div className="flex justify-center gap-6 mb-4">
           <div>
             <div className="text-2xl font-mono text-status-success">+{result.xp}</div>
-            <div className="text-xs text-cosmic-silver">XP</div>
+            <div className="text-xs text-cosmic-silver">{t('xp')}</div>
           </div>
           <div>
             <div className="text-2xl font-mono text-status-warning">+{result.coins}</div>
-            <div className="text-xs text-cosmic-silver">Coins</div>
+            <div className="text-xs text-cosmic-silver">{t('coins')}</div>
           </div>
         </div>
         <div className="text-sm text-cosmic-silver">
@@ -72,7 +72,7 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
             <div className="text-2xl font-mono text-status-premium">{currentStreak} 🔥</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-cosmic-silver">Next Bonus</div>
+            <div className="text-sm text-cosmic-silver">{t('dailyBonusNext')}</div>
             <div className="text-2xl font-mono text-plasma-cyan">+{getStreakBonus()} XP</div>
           </div>
         </div>
@@ -94,7 +94,7 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
             ))}
           </div>
           <div className="text-xs text-cosmic-silver mt-2">
-            Day 7 = Bonus gems!
+            {t('dailyBonusDay7')}
           </div>
         </div>
 
@@ -111,7 +111,7 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
               : 'bg-plasma-cyan text-space-deep hover:bg-plasma-blue'
           }`}
         >
-          {loading ? 'Claiming...' : alreadyClaimed ? 'Already Claimed' : t('dailyBonusClaim')}
+          {loading ? t('dailyBonusClaiming') : alreadyClaimed ? t('dailyBonusAlreadyClaimed') : t('dailyBonusClaim')}
         </button>
       </div>
     </div>

@@ -105,12 +105,12 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">📊 Project Tracker</h2>
+        <h2 className="text-xl font-bold">📊 {t('projectTracker')}</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
         >
-          {showForm ? 'Cancel' : '+ New Project'}
+          {showForm ? t('cancel') : t('projectNew')}
         </button>
       </div>
 
@@ -120,19 +120,19 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
           <div className="text-2xl font-mono text-plasma-cyan">
             {projects.filter(p => p.status === 'in_progress').length}
           </div>
-          <div className="text-xs text-cosmic-silver">Active</div>
+          <div className="text-xs text-cosmic-silver">{t('projectActive')}</div>
         </div>
         <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
           <div className="text-2xl font-mono text-status-success">
             {projects.filter(p => p.status === 'completed').length}
           </div>
-          <div className="text-xs text-cosmic-silver">Completed</div>
+          <div className="text-xs text-cosmic-silver">{t('projectCompleted')}</div>
         </div>
         <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
           <div className="text-2xl font-mono text-status-warning">
             {projects.reduce((sum, p) => sum + p.xp_earned, 0)}
           </div>
-          <div className="text-xs text-cosmic-silver">Total XP</div>
+          <div className="text-xs text-cosmic-silver">{t('projectTotalXp')}</div>
         </div>
       </div>
 
@@ -141,23 +141,23 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
         <form onSubmit={handleSubmit} className="bg-space-nebula rounded-lg p-4 border border-space-border">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm mb-1">Project Title</label>
+              <label className="block text-sm mb-1">{t('projectTitle')}</label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="My awesome project..."
+                placeholder={t('projectTitlePlaceholder')}
                 className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Description</label>
+              <label className="block text-sm mb-1">{t('projectDescription')}</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="What is this project about?"
+                placeholder={t('projectDescPlaceholder')}
                 className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none h-20 resize-none"
               />
             </div>
@@ -181,7 +181,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
               type="submit"
               className="w-full py-2 bg-status-success text-space-deep rounded font-bold hover:opacity-90 transition-opacity"
             >
-              Create Project
+              {t('projectCreate')}
             </button>
           </div>
         </form>
@@ -215,7 +215,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
             {/* Milestone Progress */}
             <div className="mb-3">
               <div className="flex justify-between text-sm mb-1">
-                <span>Milestones</span>
+                <span>{t('projectMilestones')}</span>
                 <span className="font-mono text-plasma-cyan">{project.milestone}/5</span>
               </div>
               <div className="flex gap-1">
@@ -242,7 +242,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
                   onClick={() => completeMilestone(project.id, project.milestone)}
                   className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
                 >
-                  + Milestone
+                  {t('projectMilestone')}
                 </button>
               )}
             </div>

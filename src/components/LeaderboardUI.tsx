@@ -42,11 +42,11 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">🏅 Leaderboard</h2>
+      <h2 className="text-xl font-bold">🏅 {t('leaderboardTitle')}</h2>
 
       <div className="bg-space-nebula rounded-xl border border-space-border overflow-hidden">
         {entries.length === 0 ? (
-          <div className="p-8 text-center text-cosmic-silver">No students yet</div>
+          <div className="p-8 text-center text-cosmic-silver">{t('leaderboardNoStudents')}</div>
         ) : (
           entries.map((entry, index) => {
             const isCurrentStudent = entry.id === currentStudentId
@@ -76,10 +76,10 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
                 <div className="flex-1">
                   <div className={`font-bold ${isCurrentStudent ? 'text-plasma-cyan' : ''}`}>
                     {entry.name}
-                    {isCurrentStudent && <span className="text-xs ml-1">(you)</span>}
+                    {isCurrentStudent && <span className="text-xs ml-1">{t('leaderboardYou')}</span>}
                   </div>
                   <div className="text-xs text-cosmic-silver">
-                    Level {level} · {stage}
+                    {t('level')} {level} · {stage}
                   </div>
                 </div>
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { t, getLocale, type Translations } from '../lib/i18n'
 
 interface TutorialSystemProps {
   onComplete: () => void
@@ -6,52 +7,52 @@ interface TutorialSystemProps {
 
 const TUTORIAL_STEPS = [
   {
-    title: 'Welcome to ONE! Profile!',
-    titleEn: 'Welcome to ONE! Profile!',
-    description: 'You are now a Space Explorer! Your mission is to develop skills, complete missions, and build your ship.',
-    descriptionEn: 'You are now a Space Explorer! Your mission is to develop skills, complete missions, and build your ship.',
+    title: 'tutorialWelcome',
+    titleEn: 'tutorialWelcome',
+    description: 'tutorialWelcomeDesc',
+    descriptionEn: 'tutorialWelcomeDesc',
     icon: '🚀',
   },
   {
-    title: 'Your Ship',
-    titleEn: 'Your Ship',
-    description: 'Your ship evolves as you level up. Start as a Scout Pod and grow into a Dreadnought!',
-    descriptionEn: 'Your ship evolves as you level up. Start as a Scout Pod and grow into a Dreadnought!',
+    title: 'tutorialShip',
+    titleEn: 'tutorialShip',
+    description: 'tutorialShipDesc',
+    descriptionEn: 'tutorialShipDesc',
     icon: '🛸',
   },
   {
-    title: '7 Directions',
-    titleEn: '7 Directions',
-    description: 'Explore Strategy, Language, Communication, Sport, IT, Art, and Entrepreneurship. Each direction has its own skills.',
-    descriptionEn: 'Explore Strategy, Language, Communication, Sport, IT, Art, and Entrepreneurship. Each direction has its own skills.',
+    title: 'tutorialDirections',
+    titleEn: 'tutorialDirections',
+    description: 'tutorialDirectionsDesc',
+    descriptionEn: 'tutorialDirectionsDesc',
     icon: '🧭',
   },
   {
-    title: 'Missions',
-    titleEn: 'Missions',
-    description: 'Complete missions to earn XP and Coins. Your Game Master will grade your work.',
-    descriptionEn: 'Complete missions to earn XP and Coins. Your Game Master will grade your work.',
+    title: 'tutorialMissions',
+    titleEn: 'tutorialMissions',
+    description: 'tutorialMissionsDesc',
+    descriptionEn: 'tutorialMissionsDesc',
     icon: '📋',
   },
   {
-    title: 'Your Squad',
-    titleEn: 'Your Squad',
-    description: 'Join a squad and work together! Your squad ship grows with everyone\'s contributions.',
-    descriptionEn: 'Join a squad and work together! Your squad ship grows with everyone\'s contributions.',
+    title: 'tutorialSquad',
+    titleEn: 'tutorialSquad',
+    description: 'tutorialSquadDesc',
+    descriptionEn: 'tutorialSquadDesc',
     icon: '👥',
   },
   {
-    title: 'Ready to Start!',
-    titleEn: 'Ready to Start!',
-    description: 'Begin your journey! Complete missions, explore directions, and become a Space Legend!',
-    descriptionEn: 'Begin your journey! Complete missions, explore directions, and become a Space Legend!',
+    title: 'tutorialReady',
+    titleEn: 'tutorialReady',
+    description: 'tutorialReadyDesc',
+    descriptionEn: 'tutorialReadyDesc',
     icon: '⭐',
   },
 ]
 
 export function TutorialSystem({ onComplete }: TutorialSystemProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [lang] = useState<'ru' | 'en'>('en')
+  const [lang] = useState<'ru' | 'en'>(getLocale())
 
   const step = TUTORIAL_STEPS[currentStep]
   const progress = ((currentStep + 1) / TUTORIAL_STEPS.length) * 100
@@ -89,10 +90,10 @@ export function TutorialSystem({ onComplete }: TutorialSystemProps) {
         <div className="bg-space-nebula rounded-xl p-8 border border-space-border text-center">
           <div className="text-6xl mb-6">{step.icon}</div>
           <h2 className="text-2xl font-bold mb-4">
-            {lang === 'ru' ? step.title : step.titleEn}
+            {lang === 'ru' ? t(step.title as keyof Translations) : t(step.titleEn as keyof Translations)}
           </h2>
           <p className="text-cosmic-silver mb-6">
-            {lang === 'ru' ? step.description : step.descriptionEn}
+            {lang === 'ru' ? t(step.description as keyof Translations) : t(step.descriptionEn as keyof Translations)}
           </p>
 
           {/* Navigation */}
@@ -101,13 +102,13 @@ export function TutorialSystem({ onComplete }: TutorialSystemProps) {
               onClick={handleSkip}
               className="flex-1 py-3 bg-space-gray text-cosmic-silver rounded-lg hover:bg-space-border transition-colors"
             >
-              Skip
+              {t('skip')}
             </button>
             <button
               onClick={handleNext}
               className="flex-1 py-3 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors"
             >
-              {currentStep < TUTORIAL_STEPS.length - 1 ? 'Next' : 'Start!'}
+              {currentStep < TUTORIAL_STEPS.length - 1 ? t('next') : t('start')}
             </button>
           </div>
         </div>

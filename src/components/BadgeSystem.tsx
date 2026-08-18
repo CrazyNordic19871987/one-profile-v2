@@ -85,7 +85,7 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
       {/* Progress Bar */}
       <div className="bg-space-nebula rounded-lg p-3 border border-space-border">
         <div className="flex justify-between text-sm mb-1">
-          <span>Badge Collection</span>
+          <span>{t('badgesCollection')}</span>
           <span className="font-mono text-plasma-cyan">
             {Math.round((earnedBadges.length / badges.length) * 100)}%
           </span>
@@ -122,14 +122,14 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
 
                 {earned ? (
                   <div className="mt-2">
-                    <span className="text-xs text-status-success">✅ Earned</span>
+                    <span className="text-xs text-status-success">✅ {t('badgesEarned')}</span>
                     {earnedDate && (
                       <div className="text-xs text-cosmic-silver mt-1">{earnedDate}</div>
                     )}
                   </div>
                 ) : (
                   <div className="mt-2">
-                    <span className="text-xs text-cosmic-silver">🔒 Locked</span>
+                    <span className="text-xs text-cosmic-silver">🔒 {t('badgesLocked')}</span>
                     <div className="text-xs text-status-premium mt-1">+{badge.xp_reward} XP</div>
                   </div>
                 )}

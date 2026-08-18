@@ -1,4 +1,5 @@
 import { DIRECTIONS } from '../lib/engine'
+import { t, getDirectionDesc } from '../lib/i18n'
 import type { Direction } from '../types/database'
 
 interface DirectionSystemProps {
@@ -14,7 +15,7 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">🧭 Professional Directions</h2>
+      <h2 className="text-xl font-bold">🧭 {t('navDirections')}</h2>
 
       <div className="grid gap-3">
         {DIRECTIONS.map((dir) => {
@@ -42,14 +43,14 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
 
                 <div className="flex-1">
                   <div className="font-bold">{dir.name}</div>
-                  <div className="text-sm text-cosmic-silver">Level {skill.level}</div>
+                  <div className="text-sm text-cosmic-silver">{t('level')} {skill.level}</div>
                 </div>
 
                 <div className="text-right">
                   <div className="font-mono text-lg" style={{ color: dir.color }}>
                     {skill.xp}
                   </div>
-                  <div className="text-xs text-cosmic-silver">XP</div>
+                  <div className="text-xs text-cosmic-silver">{t('xp')}</div>
                 </div>
               </div>
 
@@ -70,13 +71,7 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
               {isSelected && (
                 <div className="mt-3 pt-3 border-t border-space-border">
                   <div className="text-sm text-cosmic-silver">
-                    {dir.id === 'strategy' && 'Make decisions, plan ahead, lead teams'}
-                    {dir.id === 'language' && 'Learn languages, communicate globally'}
-                    {dir.id === 'communication' && 'Present ideas, work in teams, resolve conflicts'}
-                    {dir.id === 'sport' && 'Stay active, build endurance, compete fairly'}
-                    {dir.id === 'it' && 'Code, build, debug, create technology'}
-                    {dir.id === 'art' && 'Design, create, express yourself visually'}
-                    {dir.id === 'entrepreneurship' && 'Innovate, lead projects, think business'}
+                    {getDirectionDesc(dir.id)}
                   </div>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import { getShipStage } from '../lib/engine'
+import { t } from '../lib/i18n'
 
 interface SquadShipProps {
   squadLevel: number
@@ -12,7 +13,7 @@ export function SquadShip({ squadLevel, memberCount }: SquadShipProps) {
   return (
     <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
       <div className="text-center">
-        <h3 className="text-xl font-bold mb-4">🚀 Squad Ship</h3>
+        <h3 className="text-xl font-bold mb-4">🚀 {t('squadShipTitle')}</h3>
         
         {/* Ship Visual */}
         <div className="relative inline-block mb-4">
@@ -37,7 +38,7 @@ export function SquadShip({ squadLevel, memberCount }: SquadShipProps) {
         </div>
 
         <div className="text-sm text-cosmic-silver">
-          {memberCount} members contributing
+          {memberCount} {t('squadShipMembers')}
         </div>
       </div>
     </div>

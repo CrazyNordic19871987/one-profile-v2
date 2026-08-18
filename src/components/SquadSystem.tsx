@@ -69,9 +69,9 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
     return (
       <div className="bg-space-nebula rounded-lg p-6 border border-space-border text-center">
         <div className="text-4xl mb-4">👥</div>
-        <h3 className="font-bold mb-2">No Squad Yet</h3>
+        <h3 className="font-bold mb-2">{t('squadNoYet')}</h3>
         <p className="text-cosmic-silver text-sm">
-          You haven't been assigned to a squad yet. Wait for your Game Master to assign you.
+          {t('squadNoYetDesc')}
         </p>
       </div>
     )
@@ -86,11 +86,11 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold text-lg">{squad.name}</h3>
-            <p className="text-cosmic-silver text-sm">{members.length} members</p>
+            <p className="text-cosmic-silver text-sm">{members.length} {t('squadMembers')}</p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-mono text-plasma-cyan">Lvl {getSquadLevel()}</div>
-            <div className="text-xs text-cosmic-silver">Squad Level</div>
+            <div className="text-xs text-cosmic-silver">{t('squadLevel')}</div>
           </div>
         </div>
 
@@ -142,9 +142,9 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
                   )}
                 </div>
                 <div>
-                  <div className="font-medium">{member.student?.name || 'Unknown'}</div>
+                  <div className="font-medium">{member.student?.name || t('squadUnknown')}</div>
                   <div className="text-xs text-cosmic-silver">
-                    Level {member.student?.total_xp ? Math.floor(member.student.total_xp / 100) + 1 : 1}
+                    {t('level')} {member.student?.total_xp ? Math.floor(member.student.total_xp / 100) + 1 : 1}
                   </div>
                 </div>
               </div>

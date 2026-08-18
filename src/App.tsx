@@ -26,6 +26,20 @@ import { TutorialSystem } from './components/TutorialSystem'
 
 type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm'
 
+const tabs: { id: Tab; icon: string; label: string }[] = [
+  { id: 'profile', icon: '👤', label: t('navProfile') },
+  { id: 'missions', icon: '📋', label: t('navMissions') },
+  { id: 'squad', icon: '👥', label: t('navSquad') },
+  { id: 'sport', icon: '🏃', label: t('navSport') },
+  { id: 'projects', icon: '📊', label: t('navProjects') },
+  { id: 'directions', icon: '🧭', label: t('navDirections') },
+  { id: 'badges', icon: '🏆', label: t('navBadges') },
+  { id: 'perks', icon: '✨', label: t('navPerks') },
+  { id: 'ship', icon: '🚀', label: t('navShip') },
+  { id: 'prestige', icon: '⭐', label: t('navPrestige') },
+  { id: 'gm', icon: '🎮', label: t('navGM') },
+]
+
 function App() {
   const { studentId, student, skills, loading, error, refetch } = useAppData()
   const [lang, setLang] = useState<Locale>(getLocale())
@@ -33,6 +47,7 @@ function App() {
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null)
   const [showCareerTest, setShowCareerTest] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -45,7 +60,6 @@ function App() {
   const xpNeeded = xpToNextLevel(totalXp)
   const xpProgress = xpNeeded > 0 ? (xpInCurrent / xpNeeded) * 100 : 100
   const shipStage = getShipStage(level)
-
   const coins = student?.coins || 0
   const gems = student?.gems || 0
   const streak = student?.streak || 0
@@ -53,112 +67,58 @@ function App() {
   const prestigeCount = student?.prestige_count || 0
   const currentPerks = student?.perks || []
 
-  const tabs: { id: Tab; icon: string; label: string }[] = [
-    { id: 'profile', icon: '👤', label: t('navProfile') },
-    { id: 'missions', icon: '📋', label: t('navMissions') },
-    { id: 'squad', icon: '👥', label: t('navSquad') },
-    { id: 'sport', icon: '🏃', label: 'Sport' },
-    { id: 'projects', icon: '📊', label: 'Projects' },
-    { id: 'directions', icon: '🧭', label: 'Directions' },
-    { id: 'badges', icon: '🏆', label: t('navBadges') },
-    { id: 'perks', icon: '✨', label: 'Perks' },
-    { id: 'ship', icon: '🚀', label: 'Ship' },
-    { id: 'prestige', icon: '⭐', label: 'Prestige' },
-    { id: 'gm', icon: '🎮', label: 'GM' },
-  ]
-
-  if (showTutorial) {
-    return <TutorialSystem onComplete={() => setShowTutorial(false)} />
-  }
+  if (showTutorial) return <TutorialSystem onComplete={() => setShowTutorial(false)} />
 
   if (showCareerTest) {
     return (
-      <div className="min-h-screen bg-space-deep text-star-white p-4">
-        <div className="max-w-md mx-auto">
+      <div className="h-screen bg-space-deep text-star-white p-4 flex items-center justify-center">
+        <div className="w-full max-w-md">
           <button onClick={() => setShowCareerTest(false)} className="mb-4 text-cosmic-silver hover:text-star-white">← Back</button>
-          <CareerTest
-            onComplete={(direction) => {
-              setSelectedDirection(direction)
-              setShowCareerTest(false)
-              setActiveTab('directions')
-            }}
-          />
+          <CareerTest onComplete={(direction) => { setSelectedDirection(direction); setShowCareerTest(false); setActiveTab('directions') }} />
         </div>
       </div>
     )
   }
 
-  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-space-deep text-star-white flex items-center justify-center">
+      <div className="h-screen bg-space-deep text-star-white flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">🚀</div>
-          <div className="text-cosmic-silver">Loading ONE! Profile...</div>
+          <div className="text-5xl mb-4 animate-pulse">🚀</div>
+          <div className="text-lg text-cosmic-silver">{t('loading')} ONE! Profile...</div>
         </div>
       </div>
     )
   }
 
-  // Error state
   if (error || !student || !studentId) {
     return (
-      <div className="min-h-screen bg-space-deep text-star-white flex items-center justify-center p-4">
+      <div className="h-screen bg-space-deep text-star-white flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <div className="text-4xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold mb-2">Connection Error</h2>
-          <p className="text-cosmic-silver mb-4">{error || 'Failed to load profile'}</p>
-          <button
-            onClick={() => refetch()}
-            className="px-6 py-2 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors"
-          >
-            Retry
-          </button>
+          <div className="text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold mb-2">{t('error')}</h2>
+          <p className="text-cosmic-silver mb-4">{error || t('error')}</p>
+          <button onClick={refetch} className="px-6 py-2 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors">{t('retry')}</button>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-space-deep text-star-white">
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-space-border">
-        <h1 className="text-xl font-bold text-plasma-cyan font-mono">{t('appName')}</h1>
-        <div className="flex gap-2">
-          <button onClick={() => setShowTutorial(true)} className="px-3 py-1 rounded text-sm bg-space-gray text-cosmic-silver hover:bg-space-border">Tutorial</button>
-          <button onClick={() => handleLangChange('ru')} className={`px-3 py-1 rounded text-sm ${lang === 'ru' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>RU</button>
-          <button onClick={() => handleLangChange('en')} className={`px-3 py-1 rounded text-sm ${lang === 'en' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>EN</button>
-        </div>
-      </header>
+  // At this point student/studentId are guaranteed non-null
+  const sid = studentId!
+  const s = student!
 
-      {/* Navigation */}
-      <nav className="flex overflow-x-auto border-b border-space-border">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 whitespace-nowrap transition-colors ${
-              activeTab === tab.id ? 'text-plasma-cyan border-b-2 border-plasma-cyan' : 'text-cosmic-silver hover:text-star-white'
-            }`}
-          >
-            <span>{tab.icon}</span>
-            <span className="text-sm">{tab.label}</span>
-          </button>
-        ))}
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto p-4">
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <div className="space-y-4">
-            <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
-              <div className="text-center">
-                <ShipVisual level={level} className="mb-4" />
-                <h2 className="text-2xl font-bold mb-2">{student.name}</h2>
-                <p className="text-cosmic-silver mb-1">{t('profileLevel')} {level} · {shipStage}</p>
-
-                <div className="mb-6">
+  function renderContent() {
+    switch (activeTab) {
+      case 'profile': return (
+        <div className="space-y-4">
+          <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <ShipVisual level={level} className="flex-shrink-0" />
+              <div className="flex-1 text-center sm:text-left w-full">
+                <h2 className="text-2xl font-bold mb-1">{s.name}</h2>
+                <p className="text-cosmic-silver mb-3">{t('profileLevel')} {level} · {shipStage}</p>
+                <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">
                     <span>{t('xp')}</span>
                     <span className="font-mono text-plasma-cyan">{xpInCurrent} / {xpNeeded}</span>
@@ -167,76 +127,171 @@ function App() {
                     <div className="h-full bg-gradient-to-r from-plasma-cyan to-plasma-blue rounded-full transition-all duration-500" style={{ width: `${xpProgress}%` }} />
                   </div>
                 </div>
-
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-space-gray rounded-lg p-3">
-                    <div className="text-2xl mb-1">💰</div>
-                    <div className="font-mono text-status-warning">{coins}</div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-space-gray rounded-lg p-3 text-center">
+                    <div className="text-lg">💰</div>
+                    <div className="font-mono text-sm text-status-warning">{coins}</div>
                   </div>
-                  <div className="bg-space-gray rounded-lg p-3">
-                    <div className="text-2xl mb-1">💎</div>
-                    <div className="font-mono text-status-premium">{gems}</div>
+                  <div className="bg-space-gray rounded-lg p-3 text-center">
+                    <div className="text-lg">💎</div>
+                    <div className="font-mono text-sm text-status-premium">{gems}</div>
                   </div>
-                  <div className="bg-space-gray rounded-lg p-3">
-                    <div className="text-2xl mb-1">🔥</div>
-                    <div className="font-mono text-status-success">{streak}</div>
+                  <div className="bg-space-gray rounded-lg p-3 text-center">
+                    <div className="text-lg">🔥</div>
+                    <div className="font-mono text-sm text-status-success">{streak}</div>
                   </div>
                 </div>
-
-                <SkillRadar skills={skills} size={280} className="mx-auto" />
               </div>
             </div>
-
-            <DailyBonus
-              studentId={studentId}
-              currentStreak={streak}
-              lastBonusDate={lastBonusDate}
-              onBonusClaimed={refetch}
-            />
-
-            <button
-              onClick={() => setShowCareerTest(true)}
-              className="w-full bg-space-nebula rounded-xl p-4 border border-space-border hover:border-plasma-cyan transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">🧭</span>
-                <div className="text-left">
-                  <h3 className="font-bold">Take Career Test</h3>
-                  <p className="text-sm text-cosmic-silver">Discover your professional direction</p>
-                </div>
+            <div className="mt-6 flex justify-center">
+              <SkillRadar skills={skills} size={260} />
+            </div>
+          </div>
+          <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
+          <button onClick={() => setShowCareerTest(true)} className="w-full bg-space-nebula rounded-xl p-4 border border-space-border hover:border-plasma-cyan transition-colors">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🧭</span>
+              <div className="text-left">
+                <h3 className="font-bold">{t('careerTitle')}</h3>
+                <p className="text-sm text-cosmic-silver">{t('careerBasedOn')}</p>
               </div>
+            </div>
+          </button>
+        </div>
+      )
+      case 'missions': return <MissionSystem studentId={sid} onMissionComplete={refetch} />
+      case 'squad': return <SquadSystem studentId={sid} />
+      case 'sport': return <SportTracker studentId={sid} onStatAdded={refetch} />
+      case 'projects': return <ProjectTracker studentId={sid} onProjectComplete={refetch} />
+      case 'directions': return <DirectionSystem skills={skills} selectedDirection={selectedDirection} onSelectDirection={setSelectedDirection} />
+      case 'badges': return <BadgeSystem studentId={sid} />
+      case 'perks': return <PerkSystem currentPerks={currentPerks} onPerksChange={() => refetch()} />
+      case 'ship': return (
+        <div className="space-y-4">
+          <ShipEvolutionUI level={level} />
+          <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={() => refetch()} />
+        </div>
+      )
+      case 'prestige': return <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={refetch} />
+      case 'gm': return (
+        <div className="space-y-4">
+          <GMGradingWorkflow gmId={sid} />
+          <LeaderboardUI currentStudentId={sid} />
+          <SquadShip squadLevel={1} memberCount={0} />
+        </div>
+      )
+    }
+  }
+
+  const currentTab = tabs.find(t => t.id === activeTab)
+
+  return (
+    <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-56 lg:w-64 bg-space-nebula border-r border-space-border flex-shrink-0">
+        {/* Logo */}
+        <div className="px-4 py-4 border-b border-space-border">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-bold text-plasma-cyan font-mono">{t('appName')}</h1>
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-cosmic-silver hover:text-star-white lg:hidden">
+              {sidebarOpen ? '◀' : '▶'}
             </button>
           </div>
-        )}
+          {/* Quick stats */}
+          <div className="flex gap-3 mt-3">
+            <div className="flex items-center gap-1 text-xs">
+              <span>💰</span><span className="font-mono text-status-warning">{coins}</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span>💎</span><span className="font-mono text-status-premium">{gems}</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs">
+              <span>🔥</span><span className="font-mono text-status-success">{streak}</span>
+            </div>
+          </div>
+          <div className="mt-2">
+            <div className="text-xs text-cosmic-silver">{t('level')} {level} · {shipStage}</div>
+            <div className="h-1.5 bg-space-gray rounded-full overflow-hidden mt-1">
+              <div className="h-full bg-plasma-cyan rounded-full" style={{ width: `${xpProgress}%` }} />
+            </div>
+          </div>
+        </div>
 
-        {activeTab === 'missions' && <MissionSystem studentId={studentId} onMissionComplete={refetch} />}
-        {activeTab === 'squad' && <SquadSystem studentId={studentId} />}
-        {activeTab === 'sport' && <SportTracker studentId={studentId} onStatAdded={refetch} />}
-        {activeTab === 'projects' && <ProjectTracker studentId={studentId} onProjectComplete={refetch} />}
-        {activeTab === 'directions' && (
-          <DirectionSystem skills={skills} selectedDirection={selectedDirection} onSelectDirection={setSelectedDirection} />
-        )}
-        {activeTab === 'badges' && <BadgeSystem studentId={studentId} />}
-        {activeTab === 'perks' && (
-          <PerkSystem currentPerks={currentPerks} onPerksChange={() => refetch()} />
-        )}
-        {activeTab === 'ship' && (
-          <div className="space-y-4">
-            <ShipEvolutionUI level={level} />
-            <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={(_id, _cost, _currency) => refetch()} />
+        {/* Nav Items */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-plasma-cyan/10 text-plasma-cyan border-r-2 border-plasma-cyan'
+                  : 'text-cosmic-silver hover:bg-space-gray hover:text-star-white'
+              }`}
+            >
+              <span className="text-lg w-6 text-center">{tab.icon}</span>
+              <span className="text-sm font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="px-4 py-3 border-t border-space-border flex gap-2">
+          <button onClick={() => setShowTutorial(true)} className="flex-1 py-1.5 rounded text-xs bg-space-gray text-cosmic-silver hover:bg-space-border">{t('tutorial')}</button>
+          <button onClick={() => handleLangChange('ru')} className={`px-2 py-1.5 rounded text-xs ${lang === 'ru' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>RU</button>
+          <button onClick={() => handleLangChange('en')} className={`px-2 py-1.5 rounded text-xs ${lang === 'en' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>EN</button>
+        </div>
+      </aside>
+
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-space-nebula border-b border-space-border">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="text-lg font-bold text-plasma-cyan font-mono">{t('appName')}</h1>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-2 text-xs">
+              <span>💰<span className="font-mono text-status-warning ml-0.5">{coins}</span></span>
+              <span>💎<span className="font-mono text-status-premium ml-0.5">{gems}</span></span>
+              <span>🔥<span className="font-mono text-status-success ml-0.5">{streak}</span></span>
+            </div>
+            <div className="flex gap-1">
+              <button onClick={() => handleLangChange('ru')} className={`px-1.5 py-0.5 rounded text-xs ${lang === 'ru' ? 'bg-plasma-cyan text-space-deep' : 'text-cosmic-silver'}`}>RU</button>
+              <button onClick={() => handleLangChange('en')} className={`px-1.5 py-0.5 rounded text-xs ${lang === 'en' ? 'bg-plasma-cyan text-space-deep' : 'text-cosmic-silver'}`}>EN</button>
+            </div>
           </div>
-        )}
-        {activeTab === 'prestige' && (
-          <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={refetch} />
-        )}
-        {activeTab === 'gm' && (
-          <div className="space-y-4">
-            <GMGradingWorkflow gmId={studentId} />
-            <LeaderboardUI currentStudentId={studentId} />
-            <SquadShip squadLevel={1} memberCount={0} />
-          </div>
-        )}
+        </div>
+        {/* Mobile tab indicator */}
+        <div className="flex items-center justify-between px-4 pb-2">
+          <span className="text-sm font-medium">{currentTab?.icon} {currentTab?.label}</span>
+          <div className="text-xs text-cosmic-silver">{t('level')} {level}</div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto md:pt-0 pt-[88px] pb-20 md:pb-0">
+        <div className="p-4 lg:p-6 max-w-5xl">
+          {renderContent()}
+        </div>
       </main>
+
+      {/* Mobile Bottom Nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-space-nebula border-t border-space-border">
+        <div className="flex overflow-x-auto">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 min-w-[56px] transition-colors ${
+                activeTab === tab.id
+                  ? 'text-plasma-cyan'
+                  : 'text-cosmic-silver'
+              }`}
+            >
+              <span className="text-xl">{tab.icon}</span>
+              <span className="text-[10px] leading-tight">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   )
 }

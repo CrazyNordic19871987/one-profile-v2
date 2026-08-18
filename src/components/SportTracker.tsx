@@ -86,12 +86,12 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">🏃 Sport Tracker</h2>
+        <h2 className="text-xl font-bold">🏃 {t('sportTracker')}</h2>
         <button
           onClick={() => setShowForm(!showForm)}
           className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
         >
-          {showForm ? 'Cancel' : '+ Add Session'}
+          {showForm ? t('cancel') : t('sportAddSession')}
         </button>
       </div>
 
@@ -99,11 +99,11 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
           <div className="text-2xl font-mono text-status-success">{getTotalXp()}</div>
-          <div className="text-xs text-cosmic-silver">Total XP Earned</div>
+          <div className="text-xs text-cosmic-silver">{t('sportTotalXp')}</div>
         </div>
         <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
           <div className="text-2xl font-mono text-plasma-cyan">{getTotalMinutes()}</div>
-          <div className="text-xs text-cosmic-silver">Total Minutes</div>
+          <div className="text-xs text-cosmic-silver">{t('sportTotalMinutes')}</div>
         </div>
       </div>
 
@@ -112,19 +112,19 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
         <form onSubmit={handleSubmit} className="bg-space-nebula rounded-lg p-4 border border-space-border">
           <div className="space-y-3">
             <div>
-              <label className="block text-sm mb-1">Activity</label>
+              <label className="block text-sm mb-1">{t('sportActivity')}</label>
               <input
                 type="text"
                 value={formData.activity}
                 onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
-                placeholder="Running, Swimming, Yoga..."
+                placeholder={t('sportPlaceholder')}
                 className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Duration (minutes)</label>
+              <label className="block text-sm mb-1">{t('sportDuration')}</label>
               <input
                 type="number"
                 value={formData.duration_minutes}
@@ -136,7 +136,7 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Intensity</label>
+              <label className="block text-sm mb-1">{t('sportIntensity')}</label>
               <div className="flex gap-2">
                 {(['low', 'medium', 'high'] as const).map((level) => (
                   <button
@@ -156,14 +156,14 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
             </div>
 
             <div className="text-sm text-cosmic-silver">
-              Estimated XP: +{Math.round((formData.duration_minutes / 10) * (formData.intensity === 'high' ? 15 : formData.intensity === 'medium' ? 10 : 5))}
+              {t('sportEstimatedXp')} +{Math.round((formData.duration_minutes / 10) * (formData.intensity === 'high' ? 15 : formData.intensity === 'medium' ? 10 : 5))}
             </div>
 
             <button
               type="submit"
               className="w-full py-2 bg-status-success text-space-deep rounded font-bold hover:opacity-90 transition-opacity"
             >
-              Save Session
+              {t('sportSave')}
             </button>
           </div>
         </form>

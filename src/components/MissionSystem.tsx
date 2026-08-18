@@ -128,17 +128,17 @@ export function MissionSystem({ studentId, onMissionComplete }: MissionSystemPro
                     onClick={() => startMission(mission.id)}
                     className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
                   >
-                    Start
+                    {t('missionStart')}
                   </button>
                 )}
                 {status === 'pending' && (
-                  <span className="text-xs text-plasma-cyan">Awaiting grade</span>
+                  <span className="text-xs text-plasma-cyan">{t('missionAwaitingGrade')}</span>
                 )}
                 {status === 'graded' && (
-                  <span className="text-xs text-status-warning">Graded: {completion?.grade}/5</span>
+                  <span className="text-xs text-status-warning">{t('missionGraded')} {completion?.grade}/5</span>
                 )}
                 {status === 'credited' && (
-                  <span className="text-xs text-status-success">Completed!</span>
+                  <span className="text-xs text-status-success">{t('missionCompleted')}</span>
                 )}
               </div>
             </div>

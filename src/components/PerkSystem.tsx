@@ -1,3 +1,5 @@
+import { t } from '../lib/i18n'
+
 interface PerkSystemProps {
   currentPerks: string[]
   onPerksChange: (perks: string[]) => void
@@ -30,18 +32,18 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">✨ Perks</h2>
+        <h2 className="text-xl font-bold">✨ {t('perksTitle')}</h2>
         <div className="text-sm text-cosmic-silver">
-          {currentPerks.length}/{MAX_PERKS} active
+          {currentPerks.length}/{MAX_PERKS} {t('perksActive')}
         </div>
       </div>
 
       {/* Active Perks */}
       <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
-        <h3 className="font-bold mb-3">Active Perks</h3>
+        <h3 className="font-bold mb-3">{t('perksActive')}</h3>
         <div className="flex gap-2">
           {currentPerks.length === 0 ? (
-            <div className="text-sm text-cosmic-silver">No perks active. Select up to 3 below.</div>
+            <div className="text-sm text-cosmic-silver">{t('perksNoneActive')}</div>
           ) : (
             currentPerks.map(perkId => {
               const perk = AVAILABLE_PERKS.find(p => p.id === perkId)
@@ -95,7 +97,7 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
                     {perk.cost} {perk.type === 'gems' ? '💎' : '💰'}
                   </div>
                   {active && (
-                    <div className="text-xs text-plasma-cyan">Active</div>
+                    <div className="text-xs text-plasma-cyan">{t('perksActive')}</div>
                   )}
                 </div>
               </div>

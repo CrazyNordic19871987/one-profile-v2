@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getShipStage, getShipProgress } from '../lib/engine'
+import { t } from '../lib/i18n'
 
 interface ShipCustomizationProps {
   level: number
@@ -45,7 +46,7 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">🚀 Ship Customization</h2>
+        <h2 className="text-xl font-bold">🚀 {t('shipCustomization')}</h2>
         <div className="text-sm text-cosmic-silver">{stage}</div>
       </div>
 
@@ -60,7 +61,7 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
           />
         </div>
         <div className="text-xs text-cosmic-silver mt-1">
-          Level {level} • {Math.round(progress * 100)}% to next stage
+          Level {level} • {Math.round(progress * 100)}% {t('shipProgress')}
         </div>
       </div>
 
@@ -88,7 +89,7 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
                 : 'bg-space-gray text-cosmic-silver hover:bg-space-border'
             }`}
           >
-            {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat === 'all' ? t('navDirections') : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
         ))}
       </div>
@@ -116,7 +117,7 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
                 <h4 className="font-bold text-sm">{item.name}</h4>
                 <p className="text-xs text-cosmic-silver mt-1">{item.description}</p>
                 <div className={`mt-2 font-mono text-sm ${item.currency === 'gems' ? 'text-status-premium' : 'text-status-warning'}`}>
-                  {owned ? '✅ Owned' : `${item.cost} ${item.currency === 'gems' ? '💎' : '💰'}`}
+                  {owned ? `✅ ${t('shipOwned')}` : `${item.cost} ${item.currency === 'gems' ? '💎' : '💰'}`}
                 </div>
               </div>
             </div>

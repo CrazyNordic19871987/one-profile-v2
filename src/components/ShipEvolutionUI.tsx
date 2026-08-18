@@ -1,4 +1,5 @@
 import { getShipStage, SHIP_STAGES } from '../lib/engine'
+import { t } from '../lib/i18n'
 
 interface ShipEvolutionUIProps {
   level: number
@@ -11,7 +12,7 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold">🚀 Ship Evolution</h2>
+      <h2 className="text-xl font-bold">🚀 {t('shipEvolution')}</h2>
 
       {/* Evolution Timeline */}
       <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
@@ -63,8 +64,8 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
             <h3 className="font-bold text-lg">{currentStage}</h3>
             <p className="text-sm text-cosmic-silver">
               {currentIndex < SHIP_STAGES.length - 1
-                ? `${SHIP_STAGES[currentIndex + 1].minLevel - level} levels to next evolution`
-                : 'Maximum evolution reached!'}
+                ? `${SHIP_STAGES[currentIndex + 1].minLevel - level} ${t('shipLevelsToNext')}`
+                : t('shipMaxReached')}
             </p>
           </div>
         </div>
@@ -78,9 +79,9 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
               {currentIndex + 1 === 0 ? ' Pod' : currentIndex + 1 === 1 ? '🦅' : currentIndex + 1 === 2 ? '⚔️' : currentIndex + 1 === 3 ? '🛡️' : '👑'}
             </span>
             <div>
-              <h4 className="font-bold">Next: {SHIP_STAGES[currentIndex + 1].stage}</h4>
+              <h4 className="font-bold">{t('shipNext')} {SHIP_STAGES[currentIndex + 1].stage}</h4>
               <div className="text-sm text-cosmic-silver">
-                Unlocks at level {SHIP_STAGES[currentIndex + 1].minLevel}
+                {t('shipUnlocksAt')} {SHIP_STAGES[currentIndex + 1].minLevel}
               </div>
             </div>
           </div>

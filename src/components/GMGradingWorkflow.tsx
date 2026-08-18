@@ -54,11 +54,11 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
 
   function getGradeLabel(g: number): string {
     switch (g) {
-      case 5: return 'Excellent'
-      case 4: return 'Good'
-      case 3: return 'Average'
-      case 2: return 'Below Average'
-      case 1: return 'Poor'
+      case 5: return t('gmExcellent')
+      case 4: return t('gmGood')
+      case 3: return t('gmAverage')
+      case 2: return t('gmBelowAverage')
+      case 1: return t('gmPoor')
       default: return ''
     }
   }
@@ -76,15 +76,15 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">📋 {t('gmTitle')}</h2>
         <div className="text-sm text-cosmic-silver">
-          {pendingCompletions.length} pending
+          {pendingCompletions.length} {t('gmPending')}
         </div>
       </div>
 
       {pendingCompletions.length === 0 ? (
         <div className="bg-space-nebula rounded-lg p-8 border border-space-border text-center">
           <div className="text-4xl mb-4">✅</div>
-          <h3 className="font-bold mb-2">All caught up!</h3>
-          <p className="text-cosmic-silver">No missions to grade right now.</p>
+          <h3 className="font-bold mb-2">{t('gmAllCaughtUp')}</h3>
+          <p className="text-cosmic-silver">{t('gmNoMissions')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -101,9 +101,9 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                       {getDirectionName(completion.mission?.direction || 'it')}
                     </span>
                   </div>
-                  <h3 className="font-bold">{completion.mission?.title || 'Unknown Mission'}</h3>
+                  <h3 className="font-bold">{completion.mission?.title || t('squadUnknown')}</h3>
                   <p className="text-sm text-cosmic-silver mt-1">
-                    Student: {completion.student?.name || 'Unknown'}
+                    {t('gmStudent')}: {completion.student?.name || t('squadUnknown')}
                   </p>
                 </div>
                 <div className="text-right text-sm text-cosmic-silver">
@@ -114,7 +114,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
               {selectedCompletion === completion.id ? (
                 <div className="bg-space-gray rounded-lg p-4">
                   <div className="mb-4">
-                    <label className="block text-sm mb-2">Grade (1-5)</label>
+                    <label className="block text-sm mb-2">{t('gmGradeLabel')}</label>
                     <div className="flex gap-2">
                       {[1, 2, 3, 4, 5].map((g) => (
                         <button
@@ -146,7 +146,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                       onClick={() => { setSelectedCompletion(null); setGrade(3) }}
                       className="px-4 py-2 bg-space-gray text-cosmic-silver rounded hover:bg-space-border transition-colors"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                   </div>
                 </div>
@@ -155,7 +155,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                   onClick={() => setSelectedCompletion(completion.id)}
                   className="w-full py-2 bg-plasma-cyan text-space-deep rounded font-bold hover:bg-plasma-blue transition-colors"
                 >
-                  Grade Mission
+                  {t('gmGradeMission')}
                 </button>
               )}
             </div>

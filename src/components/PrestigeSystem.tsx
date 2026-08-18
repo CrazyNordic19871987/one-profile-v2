@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { levelFromXp, MAX_LEVEL } from '../lib/engine'
+import { t } from '../lib/i18n'
 
 interface PrestigeSystemProps {
   totalXp: number
@@ -29,16 +30,16 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">⭐ Prestige</h2>
-        <div className="text-sm text-cosmic-silver">Constellations: {prestigeCount}</div>
+        <h2 className="text-xl font-bold">⭐ {t('prestigeTitle')}</h2>
+        <div className="text-sm text-cosmic-silver">{t('prestigeConstellations')}: {prestigeCount}</div>
       </div>
 
       {/* Current Status */}
       <div className="bg-space-nebula rounded-xl p-6 border border-space-border text-center">
         <div className="text-6xl mb-4">🌌</div>
-        <h3 className="text-xl font-bold mb-2">Star Constellations</h3>
+        <h3 className="text-xl font-bold mb-2">{t('prestigeStarConstellations')}</h3>
         <p className="text-cosmic-silver mb-4">
-          Reach level {MAX_LEVEL} to prestige and unlock a new constellation
+          {t('prestigeReachLevel').replace('{level}', String(MAX_LEVEL))}
         </p>
 
         {/* Constellation Progress */}
@@ -60,7 +61,7 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
         {/* Current Constellation */}
         {prestigeCount > 0 && (
           <div className="bg-space-gray rounded-lg p-3 mb-4">
-            <div className="text-sm text-cosmic-silver">Current Bonus</div>
+            <div className="text-sm text-cosmic-silver">{t('prestigeCurrentBonus')}</div>
             <div className="font-mono text-status-premium">
               {CONSTELLATIONS[(prestigeCount - 1) % CONSTELLATIONS.length].bonus}
             </div>
@@ -79,13 +80,13 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
                   onClick={handlePrestige}
                   className="flex-1 py-2 bg-status-premium text-space-deep rounded font-bold hover:opacity-90"
                 >
-                  Prestige!
+                  {t('prestigeNow')}
                 </button>
                 <button
                   onClick={() => setShowConfirm(false)}
                   className="px-4 py-2 bg-space-gray text-cosmic-silver rounded hover:bg-space-border"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
               </div>
             </div>
@@ -94,13 +95,13 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
               onClick={() => setShowConfirm(true)}
               className="w-full py-3 bg-gradient-to-r from-status-premium to-status-warning text-space-deep rounded-lg font-bold hover:opacity-90 transition-opacity"
             >
-              ⭐ Prestige Now!
+              ⭐ {t('prestigeNow')}
             </button>
           )
         ) : (
           <div>
             <div className="text-sm text-cosmic-silver mb-2">
-              Level {level} / {MAX_LEVEL}
+              {t('level')} {level} / {MAX_LEVEL}
             </div>
             <div className="h-3 bg-space-gray rounded-full overflow-hidden max-w-xs mx-auto">
               <div
@@ -114,13 +115,13 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
 
       {/* Next Constellation Preview */}
       <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
-        <h4 className="font-bold mb-2">Next: {nextConstellation.name}</h4>
+        <h4 className="font-bold mb-2">{t('shipNext')} {nextConstellation.name}</h4>
         <div className="flex items-center gap-3">
           <span className="text-3xl">{nextConstellation.icon}</span>
           <div>
-            <div className="text-sm text-cosmic-silver">Bonus: {nextConstellation.bonus}</div>
+            <div className="text-sm text-cosmic-silver">{t('prestigeBonus')}: {nextConstellation.bonus}</div>
             <div className="text-xs text-cosmic-silver">
-              {prestigeCount + 1} of {CONSTELLATIONS.length} constellations
+              {prestigeCount + 1} of {CONSTELLATIONS.length} {t('prestigeConstellations')}
             </div>
           </div>
         </div>
