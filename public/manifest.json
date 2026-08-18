@@ -1,0 +1,22 @@
+{
+  "name": "ONE! Profile",
+  "short_name": "ONE! Profile",
+  "description": "Space Explorer Profile — Gamified learning platform",
+  "start_url": "/one-profile-v2/",
+  "display": "standalone",
+  "background_color": "#0A0E1A",
+  "theme_color": "#00D4FF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/one-profile-v2/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/one-profile-v2/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
