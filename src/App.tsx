@@ -47,7 +47,6 @@ function App() {
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null)
   const [showCareerTest, setShowCareerTest] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -73,7 +72,7 @@ function App() {
     return (
       <div className="h-screen bg-space-deep text-star-white p-4 flex items-center justify-center">
         <div className="w-full max-w-md">
-          <button onClick={() => setShowCareerTest(false)} className="mb-4 text-cosmic-silver hover:text-star-white">← Back</button>
+          <button onClick={() => setShowCareerTest(false)} className="mb-4 text-cosmic-silver hover:text-plasma-cyan transition-colors">← Back</button>
           <CareerTest onComplete={(direction) => { setSelectedDirection(direction); setShowCareerTest(false); setActiveTab('directions') }} />
         </div>
       </div>
@@ -85,7 +84,7 @@ function App() {
       <div className="h-screen bg-space-deep text-star-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-5xl mb-4 animate-pulse">🚀</div>
-          <div className="text-lg text-cosmic-silver">{t('loading')} ONE! Profile...</div>
+          <div className="text-lg neon-text-cyan">{t('loading')} ONE! Profile...</div>
         </div>
       </div>
     )
@@ -98,47 +97,65 @@ function App() {
           <div className="text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold mb-2">{t('error')}</h2>
           <p className="text-cosmic-silver mb-4">{error || t('error')}</p>
-          <button onClick={refetch} className="px-6 py-2 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors">{t('retry')}</button>
+          <button
+            onClick={refetch}
+            className="px-6 py-2 rounded-lg font-bold transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+              color: '#0A0E1A',
+              boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
+            }}
+          >
+            {t('retry')}
+          </button>
         </div>
       </div>
     )
   }
 
-  // At this point student/studentId are guaranteed non-null
   const sid = studentId!
   const s = student!
 
   function renderContent() {
     switch (activeTab) {
       case 'profile': return (
-        <div className="space-y-4">
-          <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
+        <div className="space-y-4 animate-fade-in">
+          <div className="neon-card p-6 scanlines">
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <ShipVisual level={level} className="flex-shrink-0" />
+              <div className="relative">
+                <ShipVisual level={level} className="flex-shrink-0" />
+              </div>
               <div className="flex-1 text-center sm:text-left w-full">
                 <h2 className="text-2xl font-bold mb-1">{s.name}</h2>
-                <p className="text-cosmic-silver mb-3">{t('profileLevel')} {level} · {shipStage}</p>
+                <p className="text-cosmic-silver mb-3 font-mono text-sm">{t('profileLevel')} {level} · {shipStage}</p>
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">
-                    <span>{t('xp')}</span>
-                    <span className="font-mono text-plasma-cyan">{xpInCurrent} / {xpNeeded}</span>
+                    <span className="text-cosmic-silver">{t('xp')}</span>
+                    <span className="font-mono neon-text-cyan">{xpInCurrent} / {xpNeeded}</span>
                   </div>
-                  <div className="h-3 bg-space-gray rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-plasma-cyan to-plasma-blue rounded-full transition-all duration-500" style={{ width: `${xpProgress}%` }} />
+                  <div className="h-2.5 bg-space-deep rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-700 ease-out"
+                      style={{
+                        width: `${xpProgress}%`,
+                        background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
+                        boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+                      }}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-space-gray rounded-lg p-3 text-center">
-                    <div className="text-lg">💰</div>
-                    <div className="font-mono text-sm text-status-warning">{coins}</div>
+                  <div className="neon-card p-3 text-center">
+                    <div className="text-lg mb-1">💰</div>
+                    <div className="font-mono text-sm neon-text-warning">{coins}</div>
                   </div>
-                  <div className="bg-space-gray rounded-lg p-3 text-center">
-                    <div className="text-lg">💎</div>
-                    <div className="font-mono text-sm text-status-premium">{gems}</div>
+                  <div className="neon-card p-3 text-center">
+                    <div className="text-lg mb-1">💎</div>
+                    <div className="font-mono text-sm neon-text-premium">{gems}</div>
                   </div>
-                  <div className="bg-space-gray rounded-lg p-3 text-center">
-                    <div className="text-lg">🔥</div>
-                    <div className="font-mono text-sm text-status-success">{streak}</div>
+                  <div className="neon-card p-3 text-center">
+                    <div className="text-lg mb-1">🔥</div>
+                    <div className="font-mono text-sm neon-text-green">{streak}</div>
                   </div>
                 </div>
               </div>
@@ -148,10 +165,17 @@ function App() {
             </div>
           </div>
           <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
-          <button onClick={() => setShowCareerTest(true)} className="w-full bg-space-nebula rounded-xl p-4 border border-space-border hover:border-plasma-cyan transition-colors">
+          <button onClick={() => setShowCareerTest(true)} className="w-full neon-card p-4 text-left">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">🧭</span>
-              <div className="text-left">
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 212, 255, 0.15))',
+                }}
+              >
+                🧭
+              </div>
+              <div>
                 <h3 className="font-bold">{t('careerTitle')}</h3>
                 <p className="text-sm text-cosmic-silver">{t('careerBasedOn')}</p>
               </div>
@@ -167,14 +191,14 @@ function App() {
       case 'badges': return <BadgeSystem studentId={sid} />
       case 'perks': return <PerkSystem currentPerks={currentPerks} onPerksChange={() => refetch()} />
       case 'ship': return (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in">
           <ShipEvolutionUI level={level} />
           <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={() => refetch()} />
         </div>
       )
       case 'prestige': return <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={refetch} />
       case 'gm': return (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fade-in">
           <GMGradingWorkflow gmId={sid} />
           <LeaderboardUI currentStudentId={sid} />
           <SquadShip squadLevel={1} memberCount={0} />
@@ -183,86 +207,152 @@ function App() {
     }
   }
 
-  const currentTab = tabs.find(t => t.id === activeTab)
+  const currentTab = tabs.find(tab => tab.id === activeTab)
 
   return (
     <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 lg:w-64 bg-space-nebula border-r border-space-border flex-shrink-0">
+      <aside className="hidden md:flex flex-col w-56 lg:w-64 border-r border-space-border flex-shrink-0" style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}>
         {/* Logo */}
-        <div className="px-4 py-4 border-b border-space-border">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-bold text-plasma-cyan font-mono">{t('appName')}</h1>
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-cosmic-silver hover:text-star-white lg:hidden">
-              {sidebarOpen ? '◀' : '▶'}
-            </button>
-          </div>
-          {/* Quick stats */}
+        <div className="px-4 py-5 border-b border-space-border">
+          <h1 className="text-xl font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
           <div className="flex gap-3 mt-3">
-            <div className="flex items-center gap-1 text-xs">
-              <span>💰</span><span className="font-mono text-status-warning">{coins}</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span>💰</span><span className="font-mono neon-text-warning">{coins}</span>
             </div>
-            <div className="flex items-center gap-1 text-xs">
-              <span>💎</span><span className="font-mono text-status-premium">{gems}</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span>💎</span><span className="font-mono neon-text-premium">{gems}</span>
             </div>
-            <div className="flex items-center gap-1 text-xs">
-              <span>🔥</span><span className="font-mono text-status-success">{streak}</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span>🔥</span><span className="font-mono neon-text-green">{streak}</span>
             </div>
           </div>
-          <div className="mt-2">
-            <div className="text-xs text-cosmic-silver">{t('level')} {level} · {shipStage}</div>
-            <div className="h-1.5 bg-space-gray rounded-full overflow-hidden mt-1">
-              <div className="h-full bg-plasma-cyan rounded-full" style={{ width: `${xpProgress}%` }} />
+          <div className="mt-3">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-cosmic-silver font-mono">{t('level')} {level}</span>
+              <span className="text-cosmic-silver font-mono">{shipStage}</span>
+            </div>
+            <div className="h-1.5 bg-space-deep rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${xpProgress}%`,
+                  background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
+                  boxShadow: '0 0 6px rgba(0, 212, 255, 0.4)',
+                }}
+              />
             </div>
           </div>
         </div>
 
         {/* Nav Items */}
         <nav className="flex-1 overflow-y-auto py-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-plasma-cyan/10 text-plasma-cyan border-r-2 border-plasma-cyan'
-                  : 'text-cosmic-silver hover:bg-space-gray hover:text-star-white'
-              }`}
-            >
-              <span className="text-lg w-6 text-center">{tab.icon}</span>
-              <span className="text-sm font-medium">{tab.label}</span>
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all duration-200 relative ${
+                  isActive
+                    ? 'nav-active-glow bg-plasma-cyan/8 text-plasma-cyan'
+                    : 'text-cosmic-silver hover:bg-space-gray/50 hover:text-star-white'
+                }`}
+              >
+                <span className="text-lg w-6 text-center">{tab.icon}</span>
+                <span className="text-sm font-medium">{tab.label}</span>
+                {isActive && (
+                  <div
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l"
+                    style={{
+                      background: '#00D4FF',
+                      boxShadow: '0 0 10px rgba(0, 212, 255, 0.6)',
+                    }}
+                  />
+                )}
+              </button>
+            )
+          })}
         </nav>
 
         {/* Footer */}
         <div className="px-4 py-3 border-t border-space-border flex gap-2">
-          <button onClick={() => setShowTutorial(true)} className="flex-1 py-1.5 rounded text-xs bg-space-gray text-cosmic-silver hover:bg-space-border">{t('tutorial')}</button>
-          <button onClick={() => handleLangChange('ru')} className={`px-2 py-1.5 rounded text-xs ${lang === 'ru' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>RU</button>
-          <button onClick={() => handleLangChange('en')} className={`px-2 py-1.5 rounded text-xs ${lang === 'en' ? 'bg-plasma-cyan text-space-deep' : 'bg-space-gray text-cosmic-silver'}`}>EN</button>
+          <button
+            onClick={() => setShowTutorial(true)}
+            className="flex-1 py-1.5 rounded text-xs text-cosmic-silver hover:text-plasma-cyan transition-colors"
+            style={{ background: 'rgba(30, 37, 56, 0.5)' }}
+          >
+            {t('tutorial')}
+          </button>
+          <button
+            onClick={() => handleLangChange('ru')}
+            className={`px-2 py-1.5 rounded text-xs font-bold transition-all ${
+              lang === 'ru'
+                ? 'text-space-deep'
+                : 'text-cosmic-silver hover:text-star-white'
+            }`}
+            style={lang === 'ru' ? {
+              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+              boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
+            } : { background: 'rgba(30, 37, 56, 0.5)' }}
+          >
+            RU
+          </button>
+          <button
+            onClick={() => handleLangChange('en')}
+            className={`px-2 py-1.5 rounded text-xs font-bold transition-all ${
+              lang === 'en'
+                ? 'text-space-deep'
+                : 'text-cosmic-silver hover:text-star-white'
+            }`}
+            style={lang === 'en' ? {
+              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+              boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
+            } : { background: 'rgba(30, 37, 56, 0.5)' }}
+          >
+            EN
+          </button>
         </div>
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-space-nebula border-b border-space-border">
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-40 border-b border-space-border"
+        style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}
+      >
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold text-plasma-cyan font-mono">{t('appName')}</h1>
+          <h1 className="text-lg font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
           <div className="flex items-center gap-3">
             <div className="flex gap-2 text-xs">
-              <span>💰<span className="font-mono text-status-warning ml-0.5">{coins}</span></span>
-              <span>💎<span className="font-mono text-status-premium ml-0.5">{gems}</span></span>
-              <span>🔥<span className="font-mono text-status-success ml-0.5">{streak}</span></span>
+              <span>💰<span className="font-mono neon-text-warning ml-0.5">{coins}</span></span>
+              <span>💎<span className="font-mono neon-text-premium ml-0.5">{gems}</span></span>
+              <span>🔥<span className="font-mono neon-text-green ml-0.5">{streak}</span></span>
             </div>
             <div className="flex gap-1">
-              <button onClick={() => handleLangChange('ru')} className={`px-1.5 py-0.5 rounded text-xs ${lang === 'ru' ? 'bg-plasma-cyan text-space-deep' : 'text-cosmic-silver'}`}>RU</button>
-              <button onClick={() => handleLangChange('en')} className={`px-1.5 py-0.5 rounded text-xs ${lang === 'en' ? 'bg-plasma-cyan text-space-deep' : 'text-cosmic-silver'}`}>EN</button>
+              <button
+                onClick={() => handleLangChange('ru')}
+                className={`px-1.5 py-0.5 rounded text-xs font-bold transition-all ${lang === 'ru' ? 'text-space-deep' : 'text-cosmic-silver'}`}
+                style={lang === 'ru' ? {
+                  background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+                } : {}}
+              >
+                RU
+              </button>
+              <button
+                onClick={() => handleLangChange('en')}
+                className={`px-1.5 py-0.5 rounded text-xs font-bold transition-all ${lang === 'en' ? 'text-space-deep' : 'text-cosmic-silver'}`}
+                style={lang === 'en' ? {
+                  background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+                } : {}}
+              >
+                EN
+              </button>
             </div>
           </div>
         </div>
-        {/* Mobile tab indicator */}
         <div className="flex items-center justify-between px-4 pb-2">
           <span className="text-sm font-medium">{currentTab?.icon} {currentTab?.label}</span>
-          <div className="text-xs text-cosmic-silver">{t('level')} {level}</div>
+          <div className="text-xs text-cosmic-silver font-mono">{t('level')} {level}</div>
         </div>
       </div>
 
@@ -274,22 +364,37 @@ function App() {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-space-nebula border-t border-space-border">
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-space-border"
+        style={{ background: 'linear-gradient(180deg, #0E1322 0%, #12182B 100%)' }}
+      >
         <div className="flex overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2 min-w-[56px] transition-colors ${
-                activeTab === tab.id
-                  ? 'text-plasma-cyan'
-                  : 'text-cosmic-silver'
-              }`}
-            >
-              <span className="text-xl">{tab.icon}</span>
-              <span className="text-[10px] leading-tight">{tab.label}</span>
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2.5 min-w-[56px] transition-all relative ${
+                  isActive
+                    ? 'text-plasma-cyan'
+                    : 'text-cosmic-silver'
+                }`}
+              >
+                <span className="text-xl">{tab.icon}</span>
+                <span className="text-[10px] leading-tight">{tab.label}</span>
+                {isActive && (
+                  <div
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
+                    style={{
+                      background: '#00D4FF',
+                      boxShadow: '0 0 8px rgba(0, 212, 255, 0.6)',
+                    }}
+                  />
+                )}
+              </button>
+            )
+          })}
         </div>
       </nav>
     </div>

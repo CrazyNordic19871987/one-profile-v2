@@ -30,13 +30,11 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
   }, [studentId])
 
   async function fetchData() {
-    // Get or create badge definitions
     const { data: existingBadges } = await supabase
       .from('badges')
       .select('*')
 
     if (!existingBadges || existingBadges.length === 0) {
-      // Insert badge definitions
       const { data: insertedBadges } = await supabase
         .from('badges')
         .insert(BADGE_DEFINITIONS)
@@ -46,7 +44,6 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
       setBadges(existingBadges)
     }
 
-    // Get earned badges
     const { data: earned } = await supabase
       .from('student_badges')
       .select('*')
@@ -73,33 +70,35 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
     )
   }
 
+  const percent = badges.length > 0 ? Math.round((earnedBadges.length / badges.length) * 100) : 0
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">🏆 {t('badgesTitle')}</h2>
-        <div className="text-sm text-cosmic-silver">
-          {earnedBadges.length} / {badges.length} {t('badgesEarned')}
+        <h2 className="text-2xl font-bold neon-text-cyan">{t('badgesTitle')}</h2>
+        <div className="text-sm text-cosmic-silver font-mono">
+          {earnedBadges.length} / {badges.length}
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-space-nebula rounded-lg p-3 border border-space-border">
-        <div className="flex justify-between text-sm mb-1">
-          <span>{t('badgesCollection')}</span>
-          <span className="font-mono text-plasma-cyan">
-            {Math.round((earnedBadges.length / badges.length) * 100)}%
-          </span>
+      <div className="neon-card p-4 scanlines">
+        <div className="flex justify-between text-sm mb-2">
+          <span className="text-cosmic-silver">{t('badgesCollection')}</span>
+          <span className="font-mono neon-text-cyan">{percent}%</span>
         </div>
-        <div className="h-2 bg-space-gray rounded-full overflow-hidden">
+        <div className="h-2 bg-space-deep rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-status-warning to-status-premium rounded-full transition-all duration-500"
-            style={{ width: `${(earnedBadges.length / badges.length) * 100}%` }}
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{
+              width: `${percent}%`,
+              background: 'linear-gradient(90deg, #00D4FF, #B24BF3, #FF2D78)',
+              boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+            }}
           />
         </div>
       </div>
 
-      {/* Badges Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {badges.map((badge) => {
           const earned = isBadgeEarned(badge.id)
           const earnedDate = getEarnedDate(badge.id)
@@ -107,30 +106,49 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
           return (
             <div
               key={badge.id}
-              className={`bg-space-nebula rounded-lg p-4 border transition-all ${
-                earned
-                  ? 'border-status-success shadow-lg shadow-status-success/20'
-                  : 'border-space-border opacity-60'
-              }`}
+              className={`relative badge-zoom ${earned ? 'badge-earned' : ''}`}
             >
-              <div className="text-center">
-                <div className={`text-4xl mb-2 ${earned ? '' : 'grayscale'}`}>
-                  {badge.icon_url || '🏅'}
+              <div className="badge-glow-ring" />
+
+              <div
+                className={`neon-card p-4 text-center transition-all ${
+                  earned
+                    ? 'neon-glow-cyan'
+                    : 'opacity-50 grayscale hover:opacity-80 hover:grayscale-[50%]'
+                }`}
+              >
+                <div
+                  className={`mx-auto mb-3 flex items-center justify-center rounded-full transition-all duration-300 ${
+                    earned ? 'w-20 h-20' : 'w-16 h-16'
+                  }`}
+                  style={{
+                    background: earned
+                      ? 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(178, 75, 243, 0.15))'
+                      : 'rgba(30, 37, 56, 0.8)',
+                    boxShadow: earned
+                      ? '0 0 20px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.1)'
+                      : 'none',
+                  }}
+                >
+                  <span className={`${earned ? 'text-4xl' : 'text-3xl'}`}>
+                    {badge.icon_url || '🏅'}
+                  </span>
                 </div>
-                <h3 className="font-bold text-sm">{badge.name}</h3>
-                <p className="text-xs text-cosmic-silver mt-1">{badge.description}</p>
+
+                <h3 className="font-bold text-sm mb-1">{badge.name}</h3>
+                <p className="text-xs text-cosmic-silver leading-tight">{badge.description}</p>
 
                 {earned ? (
-                  <div className="mt-2">
-                    <span className="text-xs text-status-success">✅ {t('badgesEarned')}</span>
+                  <div className="mt-3 pt-3 border-t border-space-border">
+                    <span className="text-xs neon-text-green font-bold">✓ {t('badgesEarned')}</span>
                     {earnedDate && (
-                      <div className="text-xs text-cosmic-silver mt-1">{earnedDate}</div>
+                      <div className="text-xs text-cosmic-silver mt-1 font-mono">{earnedDate}</div>
                     )}
                   </div>
                 ) : (
-                  <div className="mt-2">
+                  <div className="mt-3 pt-3 border-t border-space-border">
                     <span className="text-xs text-cosmic-silver">🔒 {t('badgesLocked')}</span>
-                    <div className="text-xs text-status-premium mt-1">+{badge.xp_reward} XP</div>
+                    <div className="text-xs neon-text-warning font-mono mt-1">+{badge.xp_reward} XP</div>
                   </div>
                 )}
               </div>
