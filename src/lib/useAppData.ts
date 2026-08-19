@@ -48,9 +48,11 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
           .from('students')
           .insert({
             id: user.id,
-            name: displayName,
+            nickname: displayName,
+            real_name: displayName,
             class: 'Scout',
             total_xp: 0,
+            xp: 0,
             coins: 0,
             gems: 0,
             streak: 0,

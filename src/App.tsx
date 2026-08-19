@@ -155,7 +155,7 @@ function App() {
                 <ShipVisual level={level} className="flex-shrink-0" />
               </div>
               <div className="flex-1 text-center sm:text-left w-full">
-                <h2 className="text-2xl font-bold mb-1">{s.name}</h2>
+                <h2 className="text-2xl font-bold mb-1">{s.nickname}</h2>
                 <p className="text-cosmic-silver mb-3 font-mono text-sm">{t('profileLevel')} {level} · {shipStage}</p>
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">

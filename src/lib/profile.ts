@@ -49,11 +49,11 @@ export async function getStudentProfile(studentId: string): Promise<StudentProfi
 
 export async function updateStudentProfile(
   studentId: string,
-  updates: Partial<Pick<Student, 'name' | 'photo_url' | 'perks'>>
+  updates: Partial<Pick<Student, 'nickname' | 'real_name' | 'perks'>>
 ): Promise<Student | null> {
   const { data, error } = await supabase
     .from('students')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update({ ...updates })
     .eq('id', studentId)
     .select()
     .single()
@@ -65,15 +65,19 @@ export async function updateStudentProfile(
 // === Create Profile ===
 
 export async function createStudentProfile(
-  name: string,
-  classType: Student['class'] = 'Scout'
+  id: string,
+  nickname: string,
+  classType: string = 'Scout'
 ): Promise<Student | null> {
   const { data, error } = await supabase
     .from('students')
     .insert({
-      name,
+      id,
+      nickname,
+      real_name: nickname,
       class: classType,
       total_xp: 0,
+      xp: 0,
       coins: 0,
       gems: 0,
       streak: 0,
@@ -126,7 +130,7 @@ export async function getSquadMembers(squadId: string): Promise<SquadMember[]> {
 export async function setStudentPerks(studentId: string, perks: string[]): Promise<void> {
   const { error } = await supabase
     .from('students')
-    .update({ perks, updated_at: new Date().toISOString() })
+    .update({ perks })
     .eq('id', studentId)
 
   if (error) throw new Error('Failed to update perks')

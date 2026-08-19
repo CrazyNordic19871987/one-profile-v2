@@ -5,7 +5,7 @@ import { t } from '../lib/i18n'
 
 interface LeaderboardEntry {
   id: string
-  name: string
+  nickname: string
   total_xp: number
 }
 
@@ -24,7 +24,7 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
   async function fetchLeaderboard() {
     const { data } = await supabase
       .from('students')
-      .select('id, name, total_xp')
+      .select('id, nickname, total_xp')
       .order('total_xp', { ascending: false })
       .limit(10)
 
@@ -86,7 +86,7 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
 
                 <div className="flex-1">
                   <div className={`font-bold ${isCurrentStudent ? 'neon-text-cyan' : ''}`}>
-                    {entry.name}
+                    {entry.nickname}
                     {isCurrentStudent && (
                       <span className="text-xs ml-2 px-2 py-0.5 rounded-full bg-plasma-cyan/10 text-plasma-cyan font-mono">
                         {t('leaderboardYou')}

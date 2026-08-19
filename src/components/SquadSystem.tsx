@@ -132,18 +132,10 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-space-border flex items-center justify-center">
-                  {member.student?.photo_url ? (
-                    <img
-                      src={member.student.photo_url}
-                      alt=""
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm">👤</span>
-                  )}
+                  <span className="text-sm">{member.student?.emoji || '👤'}</span>
                 </div>
                 <div>
-                  <div className="font-medium">{member.student?.name || t('squadUnknown')}</div>
+                  <div className="font-medium">{member.student?.nickname || t('squadUnknown')}</div>
                   <div className="text-xs text-cosmic-silver">
                     {t('level')} {levelFromXp(member.student?.total_xp || 0)}
                   </div>

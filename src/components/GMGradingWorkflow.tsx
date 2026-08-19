@@ -103,7 +103,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                   </div>
                   <h3 className="font-bold">{completion.mission?.title || t('squadUnknown')}</h3>
                   <p className="text-sm text-cosmic-silver mt-1">
-                    {t('gmStudent')}: {completion.student?.name || t('squadUnknown')}
+                    {t('gmStudent')}: {completion.student?.nickname || t('squadUnknown')}
                   </p>
                 </div>
                 <div className="text-right text-sm text-cosmic-silver">

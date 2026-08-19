@@ -1,18 +1,22 @@
 export interface Student {
   id: string
-  name: string
-  class: 'Scout' | 'Explorer' | 'Pathfinder' | 'Innovator' | 'Leader'
-  photo_url: string | null
+  nickname: string
+  real_name: string | null
+  emoji: string | null
+  age: number | null
+  class: string
+  clan_id: string | null
   perks: string[]
   total_xp: number
+  xp: number
   coins: number
   gems: number
+  league_key: string | null
   streak: number
   last_bonus_date: string | null
   prestige_count: number
   prestige_constellation: string | null
   created_at: string
-  updated_at: string
 }
 
 export interface Skill {
