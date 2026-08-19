@@ -7,6 +7,13 @@ import type { Direction } from '../types/database'
 export const MAX_COINS = 9999
 export const MAX_GEMS = 999
 
+// === Streak Freeze ===
+// Players get 1 streak freeze per 7-day streak. If they miss a day, the freeze is consumed.
+// This prevents losing a long streak due to one missed day.
+
+// === Comeback Bonus ===
+// If a player returns after 3+ days without logging in, they get a comeback XP bonus.
+
 // === Currency Functions ===
 
 export function clampCoins(coins: number): number {
@@ -51,9 +58,9 @@ export async function addXp(studentId: string, amount: number, _reason: string):
 
   if (updateError) throw new Error('Failed to update XP')
 
-  // If level up, add gems reward
+  // If level up, add gems reward — more generous to fix gem economy
   if (levelUp) {
-    const gemsReward = newLevelVal >= 100 ? 20 : newLevelVal >= 50 ? 15 : newLevelVal >= 25 ? 10 : 5
+    const gemsReward = newLevelVal >= 100 ? 25 : newLevelVal >= 50 ? 20 : newLevelVal >= 25 ? 15 : newLevelVal >= 10 ? 10 : 5
     await addGems(studentId, gemsReward, `Level ${newLevelVal} reached`)
   }
 
@@ -233,10 +240,10 @@ export async function updateDirectionXp(studentId: string, direction: Direction,
 
 // === Daily Bonus ===
 
-export async function claimDailyBonus(studentId: string): Promise<{ xp: number; coins: number; streak: number }> {
+export async function claimDailyBonus(studentId: string): Promise<{ xp: number; coins: number; streak: number; comebackBonus: boolean; streakFreezeUsed: boolean }> {
   const { data: profile, error } = await supabase
     .from('students')
-    .select('last_bonus_date, streak')
+    .select('last_bonus_date, streak, perks')
     .eq('id', studentId)
     .single()
 
@@ -250,21 +257,77 @@ export async function claimDailyBonus(studentId: string): Promise<{ xp: number; 
     throw new Error('Daily bonus already claimed today')
   }
 
-  // Calculate streak — scale up: XP = 10 + (streak × 5) + (min(streak,7) × 2)
+  // Calculate streak
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayStr = yesterday.toISOString().split('T')[0]
 
-  const newStreak = lastBonus === yesterdayStr ? profile.streak + 1 : 1
-  const streakBonus = Math.min(newStreak, 7)
+  // Check for gap (days since last bonus)
+  let gapDays = 0
+  if (lastBonus) {
+    const lastDate = new Date(lastBonus)
+    const todayDate = new Date(today)
+    gapDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+  }
 
-  const xp = 10 + (newStreak * 5) + (streakBonus * 2)
-  const coins = 5 + (newStreak * 3) + (streakBonus * 1)
+  const hasStreakFreeze = (profile.perks || []).includes('streak_freeze')
+  let streakFreezeUsed = false
+  let comebackBonus = false
+  let newStreak: number
+
+  if (lastBonus === yesterdayStr) {
+    // Consecutive day
+    newStreak = profile.streak + 1
+  } else if (gapDays === 2 && hasStreakFreeze) {
+    // Missed 1 day but have streak freeze — consume it
+    newStreak = profile.streak + 1
+    streakFreezeUsed = true
+    // Remove streak freeze from perks
+    const updatedPerks = (profile.perks as string[] || []).filter((p: string) => p !== 'streak_freeze')
+    await supabase
+      .from('students')
+      .update({ perks: updatedPerks, updated_at: new Date().toISOString() })
+      .eq('id', studentId)
+  } else if (gapDays > 3 && lastBonus) {
+    // Comeback after 3+ days
+    newStreak = 1
+    comebackBonus = true
+  } else {
+    // Streak broken
+    newStreak = 1
+  }
+
+  const streakBonus = Math.min(newStreak, 7)
+  let xp = 10 + (newStreak * 5) + (streakBonus * 2)
+  let coins = 5 + (newStreak * 3) + (streakBonus * 1)
+
+  // Comeback bonus: 2x XP for returning after break
+  if (comebackBonus) {
+    xp = Math.round(xp * 2)
+    coins = Math.round(coins * 1.5)
+  }
 
   // Day 7 milestone: bonus gems
-  if (newStreak >= 7) {
-    const gemsBonus = Math.floor(newStreak / 7) * 5
+  const day7Milestones = Math.floor(newStreak / 7)
+  if (day7Milestones > 0) {
+    const gemsBonus = day7Milestones * 5
     await addGems(studentId, gemsBonus, 'Daily bonus streak milestone')
+  }
+
+  // Login milestone gems: at 3, 7, 14, 30 days
+  const milestones = [3, 7, 14, 30]
+  if (milestones.includes(newStreak)) {
+    const milestoneGems = newStreak >= 30 ? 20 : newStreak >= 14 ? 15 : newStreak >= 7 ? 10 : 5
+    await addGems(studentId, milestoneGems, `Login milestone: day ${newStreak}`)
+  }
+
+  // Give streak freeze at every 7-day streak
+  if (newStreak > 0 && newStreak % 7 === 0 && !hasStreakFreeze) {
+    const currentPerks = profile.perks || []
+    await supabase
+      .from('students')
+      .update({ perks: [...currentPerks, 'streak_freeze'], updated_at: new Date().toISOString() })
+      .eq('id', studentId)
   }
 
   // Update profile
@@ -281,7 +344,7 @@ export async function claimDailyBonus(studentId: string): Promise<{ xp: number; 
   await addXp(studentId, xp, 'Daily bonus')
   await addCoins(studentId, coins, 'Daily bonus')
 
-  return { xp, coins, streak: newStreak }
+  return { xp, coins, streak: newStreak, comebackBonus, streakFreezeUsed }
 }
 
 // === Prestige ===

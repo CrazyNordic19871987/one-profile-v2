@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { t } from '../lib/i18n'
+import { t, getLocale } from '../lib/i18n'
 import { claimDailyBonus } from '../lib/currency'
 
 interface DailyBonusProps {
@@ -11,8 +11,9 @@ interface DailyBonusProps {
 
 export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusClaimed }: DailyBonusProps) {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ xp: number; coins: number; streak: number } | null>(null)
+  const [result, setResult] = useState<{ xp: number; coins: number; streak: number; comebackBonus: boolean; streakFreezeUsed: boolean } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const lang = getLocale()
 
   const today = new Date().toISOString().split('T')[0]
   const alreadyClaimed = lastBonusDate === today
@@ -51,6 +52,24 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
         <h3 className="text-xl font-bold mb-3 neon-text-green">
           {t('dailyBonusClaimed')}
         </h3>
+        {result.comebackBonus && (
+          <div className="mb-3 px-3 py-2 rounded-lg text-sm font-bold" style={{
+            background: 'linear-gradient(135deg, rgba(178, 75, 243, 0.15), rgba(255, 45, 120, 0.15))',
+            border: '1px solid rgba(178, 75, 243, 0.3)',
+            color: '#B24BF3',
+          }}>
+            🎉 {lang === 'ru' ? 'Бонус возвращения! 2x XP' : 'Comeback Bonus! 2x XP'}
+          </div>
+        )}
+        {result.streakFreezeUsed && (
+          <div className="mb-3 px-3 py-2 rounded-lg text-sm font-bold" style={{
+            background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 230, 118, 0.15))',
+            border: '1px solid rgba(0, 212, 255, 0.3)',
+            color: '#00D4FF',
+          }}>
+            🧊 {lang === 'ru' ? 'Заморозка серии использована!' : 'Streak Freeze used!'}
+          </div>
+        )}
         <div className="flex justify-center gap-8 mb-4">
           <div>
             <div className="text-3xl font-mono font-bold neon-text-green">+{result.xp}</div>
