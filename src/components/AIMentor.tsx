@@ -31,6 +31,8 @@ export function AIMentor({ studentName, competencyScores, obsCount, avgScore }: 
     setLoading(true)
     setError(null)
 
+    const hasObs = obsCount > 0
+
     const topSkills = Object.entries(competencyScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
@@ -43,7 +45,8 @@ export function AIMentor({ studentName, competencyScores, obsCount, avgScore }: 
       .map(([id, val]) => `${id}: ${val}%`)
       .join(', ')
 
-    const prompt = `Analyze this student profile and provide a brief mentor conclusion in Russian (3-4 sentences):
+    const prompt = hasObs
+      ? `Analyze this student profile and provide a brief mentor conclusion in Russian (3-4 sentences):
 Student: ${studentName}
 Total observations: ${obsCount}
 Average score: ${avgScore}/5
@@ -55,6 +58,18 @@ Provide:
 2. Areas for growth
 3. One specific recommendation
 Keep it encouraging and constructive. Write in Russian.`
+      : `Analyze this student profile and provide a brief mentor conclusion in Russian (3-4 sentences).
+Note: no observation data yet, so base your analysis on competency radar data only.
+
+Student: ${studentName}
+Competency scores (from radar): ${topSkills}
+Lower areas: ${bottomSkills}
+
+Provide:
+1. Likely strengths based on available data
+2. Areas to watch for development
+3. One specific recommendation for the counselor to observe
+Keep it encouraging. Write in Russian.`
 
     try {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -110,17 +125,15 @@ Keep it encouraging and constructive. Write in Russian.`
       {!insight && !showKeyInput && (
         <button
           onClick={generateInsight}
-          disabled={loading || obsCount === 0}
-          className={`w-full py-2.5 rounded-lg text-sm font-bold transition-all ${
-            obsCount === 0 ? 'opacity-40 cursor-not-allowed' : ''
-          }`}
-          style={{ background: 'linear-gradient(135deg, #B24BF3, #FF2D78)', color: '#fff' }}
+          disabled={loading}
+          className="w-full py-2.5 rounded-lg text-sm font-bold transition-all"
+          style={{ background: 'linear-gradient(135deg, #B24BF3, #FF2D78)', color: '#fff', opacity: loading ? 0.6 : 1 }}
         >
           {loading ? '🔄...' : `✨ ${t('aiGenerate')}`}
         </button>
       )}
 
-      {obsCount === 0 && !loading && !showKeyInput && (
+      {obsCount === 0 && !loading && !showKeyInput && !insight && (
         <p className="text-xs text-cosmic-silver text-center">{t('aiNoData')}</p>
       )}
 
