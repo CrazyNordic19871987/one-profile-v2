@@ -26,6 +26,7 @@ import { SquadShip } from './components/SquadShip'
 import { LeaderboardUI } from './components/LeaderboardUI'
 import { ShipEvolutionUI } from './components/ShipEvolutionUI'
 import { TutorialSystem } from './components/TutorialSystem'
+import { MysteryBox } from './components/MysteryBox'
 import { NotificationSystem, useNotifications } from './components/NotificationSystem'
 
 type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm' | 'more'
@@ -60,6 +61,7 @@ function App() {
   const [showMoreDrawer, setShowMoreDrawer] = useState(false)
   const moreDrawerRef = useRef<HTMLDivElement>(null)
   const badgesEvaluatedRef = useRef(false)
+  const [showLevelUp, setShowLevelUp] = useState(false)
 
   const totalXp = student?.total_xp || 0
   const level = levelFromXp(totalXp)
@@ -74,6 +76,7 @@ function App() {
   const prestigeCount = student?.prestige_count || 0
   const currentPerks = student?.perks || []
   const sid = studentId!
+  const prevLevelRef = useRef(level)
 
   // Evaluate badges on load (once per session)
   useEffect(() => {
@@ -83,6 +86,34 @@ function App() {
       newBadges.forEach(name => addNotification('success', `${lang === 'ru' ? 'Бейдж получен' : 'Badge earned'}: ${name}`))
     }).catch(() => {})
   }, [sid])
+
+  // Escape key closes More Drawer
+  useEffect(() => {
+    if (!showMoreDrawer) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMoreDrawer(false)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [showMoreDrawer])
+
+  // Auto-tutorial for first-time users (total_xp === 0 means never completed a mission)
+  useEffect(() => {
+    if (!student || loading) return
+    const hasSeenTutorial = localStorage.getItem('one-profile-tutorial-seen')
+    if (!hasSeenTutorial && (student.total_xp || 0) === 0) {
+      setShowTutorial(true)
+    }
+  }, [student, loading])
+
+  // Level-up detection
+  useEffect(() => {
+    if (prevLevelRef.current < level) {
+      setShowLevelUp(true)
+      setTimeout(() => setShowLevelUp(false), 2500)
+    }
+    prevLevelRef.current = level
+  }, [level])
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -200,20 +231,22 @@ function App() {
               <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 215, 64, 0.2)' }}>
                 <div className="text-base mb-0.5">💰</div>
                 <div className="font-mono text-sm font-bold" style={{ color: '#FFD740' }}>{coins}</div>
-                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('coinsLabel')}</div>
+                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('coinsLabel')}</div>
               </div>
               <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(0, 212, 255, 0.2)' }}>
                 <div className="text-base mb-0.5">💎</div>
                 <div className="font-mono text-sm font-bold" style={{ color: '#00D4FF' }}>{gems}</div>
-                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('gemsLabel')}</div>
+                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('gemsLabel')}</div>
               </div>
               <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 145, 0, 0.2)' }}>
                 <div className="text-base mb-0.5">🔥</div>
                 <div className="font-mono text-sm font-bold" style={{ color: '#FF9100' }}>{streak}</div>
-                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('streakLabel')}</div>
+                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('streakLabel')}</div>
               </div>
             </div>
           </div>
+
+          <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
 
           {/* Skill Radar — shrunk, with empty state */}
           <div className="neon-card p-4 scanlines flex justify-center">
@@ -237,8 +270,6 @@ function App() {
             </div>
           </button>
 
-          <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
-
           {/* Career Test */}
           <button onClick={() => setShowCareerTest(true)} className="w-full neon-card p-4 text-left">
             <div className="flex items-center gap-3">
@@ -253,6 +284,9 @@ function App() {
               </div>
             </div>
           </button>
+
+          {/* Mystery Box — coin sink */}
+          <MysteryBox studentId={sid} coins={coins} gems={gems} onOpened={refetch} />
         </div>
       )
       case 'missions': return <MissionSystem studentId={sid} onMissionComplete={refetch} />
@@ -281,23 +315,48 @@ function App() {
 
   const currentTab = tabs.find(tab => tab.id === activeTab)
 
+  // Level-based feature gating
+  const visibleOverflowTabs = OVERFLOW_TABS.filter(tabId => {
+    if (tabId === 'prestige' && level < 25) return false
+    if (tabId === 'ship' && level < 3) return false
+    if (tabId === 'sport' && level < 2) return false
+    if (tabId === 'perks' && level < 5) return false
+    return true
+  })
+
   return (
     <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
+      <a href="#main-content" className="skip-to-content">{t('loading') === 'Загрузка...' ? 'Перейти к содержимому' : 'Skip to content'}</a>
       <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
+
+      {/* Level-Up Celebration Overlay */}
+      {showLevelUp && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none level-up-overlay">
+          <div className="text-center">
+            <div className="text-7xl mb-4">🎉</div>
+            <div className="text-3xl font-bold neon-text-cyan mb-2">
+              {t('level')} {level}!
+            </div>
+            <div className="text-lg" style={{ color: '#B24BF3' }}>
+              {lang === 'ru' ? 'Уровень повышен!' : 'Level Up!'}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-56 lg:w-64 border-r border-space-border flex-shrink-0" style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}>
         {/* Logo */}
         <div className="px-4 py-5 border-b border-space-border">
           <h1 className="text-xl font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
-          <div className="flex gap-3 mt-3">
+          <div className="flex gap-3 mt-3" aria-live="polite">
             <div className="flex items-center gap-1.5 text-xs">
-              <span>💰</span><span className="font-mono neon-text-warning">{coins}</span>
+              <span aria-hidden="true">💰</span><span className="font-mono neon-text-warning">{coins}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
-              <span>💎</span><span className="font-mono neon-text-premium">{gems}</span>
+              <span aria-hidden="true">💎</span><span className="font-mono neon-text-premium">{gems}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
-              <span>🔥</span><span className="font-mono neon-text-green">{streak}</span>
+              <span aria-hidden="true">🔥</span><span className="font-mono neon-text-green">{streak}</span>
             </div>
           </div>
           <div className="mt-3">
@@ -326,6 +385,8 @@ function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                aria-label={tab.label}
+                aria-current={isActive ? 'page' : undefined}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all duration-200 relative ${
                   isActive
                     ? 'nav-active-glow bg-plasma-cyan/8 text-plasma-cyan'
@@ -361,7 +422,7 @@ function App() {
             onClick={() => signOut()}
             className="flex-1 py-1.5 rounded text-xs text-cosmic-silver hover:text-status-error transition-colors"
             style={{ background: 'rgba(30, 37, 56, 0.5)' }}
-            title={lang === 'ru' ? 'Выйти' : 'Sign Out'}
+            aria-label={lang === 'ru' ? 'Выйти' : 'Sign Out'}
           >
             {lang === 'ru' ? 'Выйти' : 'Sign Out'}
           </button>
@@ -404,10 +465,10 @@ function App() {
         <div className="flex items-center justify-between px-4 py-3">
           <h1 className="text-lg font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
           <div className="flex items-center gap-3">
-            <div className="flex gap-2 text-xs">
-              <span>💰<span className="font-mono neon-text-warning ml-0.5">{coins}</span></span>
-              <span>💎<span className="font-mono neon-text-premium ml-0.5">{gems}</span></span>
-              <span>🔥<span className="font-mono neon-text-green ml-0.5">{streak}</span></span>
+            <div className="flex gap-2 text-xs" aria-live="polite">
+              <span><span aria-hidden="true">💰</span><span className="font-mono neon-text-warning ml-0.5">{coins}</span></span>
+              <span><span aria-hidden="true">💎</span><span className="font-mono neon-text-premium ml-0.5">{gems}</span></span>
+              <span><span aria-hidden="true">🔥</span><span className="font-mono neon-text-green ml-0.5">{streak}</span></span>
             </div>
             <div className="flex gap-1">
               <button
@@ -430,8 +491,8 @@ function App() {
               </button>
               <button
                 onClick={() => signOut()}
-                className="px-1.5 py-0.5 rounded text-xs font-bold text-cosmic-silver hover:text-status-error transition-colors"
-                title={lang === 'ru' ? 'Выйти' : 'Sign Out'}
+                className="px-2 py-1.5 rounded text-xs font-bold text-cosmic-silver hover:text-status-error transition-colors"
+                aria-label={lang === 'ru' ? 'Выйти' : 'Sign Out'}
               >
                 ⏻
               </button>
@@ -445,7 +506,7 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto md:pt-0 pt-[88px] pb-20 md:pb-0">
+      <main id="main-content" className="flex-1 overflow-y-auto md:pt-0 pt-[88px] pb-20 md:pb-0" tabIndex={-1}>
         <div className="p-4 lg:p-6 max-w-5xl">
           {renderContent()}
         </div>
@@ -471,7 +532,9 @@ function App() {
                     setActiveTab(tabId)
                   }
                 }}
-                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2.5 flex-1 min-w-0 transition-all relative ${
+                aria-label={tab.label}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-3 flex-1 min-w-0 transition-all relative ${
                   isActive
                     ? 'text-plasma-cyan'
                     : 'text-cosmic-silver'
@@ -513,12 +576,13 @@ function App() {
                 onClick={() => setShowMoreDrawer(false)}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-cosmic-silver hover:text-star-white transition-colors"
                 style={{ background: 'rgba(30, 37, 56, 0.8)' }}
+                aria-label={lang === 'ru' ? 'Закрыть' : 'Close'}
               >
                 ✕
               </button>
             </div>
             <div className="p-2 pb-8 grid grid-cols-4 gap-2">
-              {OVERFLOW_TABS.map((tabId) => {
+              {visibleOverflowTabs.map((tabId) => {
                 const tab = tabs.find(t => t.id === tabId)!
                 const isActive = activeTab === tabId
                 return (
@@ -528,6 +592,7 @@ function App() {
                       setActiveTab(tabId)
                       setShowMoreDrawer(false)
                     }}
+                    aria-label={tab.label}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
                       isActive
                         ? 'bg-plasma-cyan/10 text-plasma-cyan'

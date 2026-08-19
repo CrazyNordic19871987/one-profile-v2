@@ -61,11 +61,13 @@ export function TutorialSystem({ onComplete }: TutorialSystemProps) {
     if (currentStep < TUTORIAL_STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
+      localStorage.setItem('one-profile-tutorial-seen', 'true')
       onComplete()
     }
   }
 
   function handleSkip() {
+    localStorage.setItem('one-profile-tutorial-seen', 'true')
     onComplete()
   }
 

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { DIRECTIONS } from '../lib/engine'
+import { t } from '../lib/i18n'
 import type { Direction } from '../types/database'
 
 interface SkillRadarProps {
@@ -29,20 +30,20 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
 
   if (!hasAnyXp) {
     return (
-      <div className={`radar-empty-shimmer rounded-xl p-6 text-center ${className}`} style={{
+      <div className="radar-empty-shimmer rounded-xl p-6 text-center" style={{
         background: 'linear-gradient(135deg, rgba(18, 24, 43, 0.6), rgba(30, 37, 56, 0.4))',
         border: '1px dashed rgba(0, 212, 255, 0.2)',
       }}>
-        <div className="text-4xl mb-3 opacity-40">🕸️</div>
-        <p className="text-sm font-bold text-cosmic-silver mb-1">Навыки закрыты</p>
-        <p className="text-xs opacity-50">Пройди первую миссию, чтобы открыть навыки</p>
+        <div className="text-4xl mb-3 opacity-40" aria-hidden="true">🕸️</div>
+        <p className="text-sm font-bold text-cosmic-silver mb-1">{t('radarEmpty')}</p>
+        <p className="text-xs" style={{ color: '#A0AAB8' }}>{t('radarEmptyDesc')}</p>
       </div>
     )
   }
 
   return (
     <div className={`relative ${className}`}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Skill radar chart">
         {gridLevels.map((level) => (
           <circle
             key={level}
@@ -112,6 +113,13 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
         })}
       </svg>
 
+      <div className="sr-only" aria-live="polite">
+        {DIRECTIONS.map(dir => {
+          const skill = skills.find(s => s.direction === dir.id)
+          const xp = skill?.xp || 0
+          return `${dir.name}: ${xp} XP`
+        }).join(', ')}
+      </div>
       <div className="mt-2 grid grid-cols-2 gap-1 text-xs">
         {DIRECTIONS.map((dir) => {
           const skill = skills.find(s => s.direction === dir.id)
