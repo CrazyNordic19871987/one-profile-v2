@@ -203,6 +203,78 @@ export interface Translations {
   dailyBonusFreezeCount: string
   dailyBonusComeback: string
   dailyBonusStreakFreezeUsed: string
+
+  navShifts: string
+  navObservations: string
+  navReport: string
+
+  shiftManagerTitle: string
+  shiftCreate: string
+  shiftName: string
+  shiftStart: string
+  shiftEnd: string
+  shiftStudents: string
+  shiftEmpty: string
+  shiftSquads: string
+  shiftSquadCreate: string
+  shiftSquadName: string
+  shiftAssignStudent: string
+  shiftRemoveStudent: string
+  shiftNoStudents: string
+  shiftAllStudents: string
+  shiftAssigned: string
+
+  obsTitle: string
+  obsSelectStudent: string
+  obsSelectDay: string
+  obsSelectTrack: string
+  obsIndependence: string
+  obsQuality: string
+  obsInitiative: string
+  obsNotes: string
+  obsSave: string
+  obsSaved: string
+  obsCount: string
+  obsHistory: string
+  obsDay: string
+  obsTrack: string
+  obsScore: string
+
+  radarTitle: string
+  radarCompetencies: string
+
+  discTitle: string
+  discDominant: string
+  discType_D: string
+  discType_I: string
+  discType_S: string
+  discType_C: string
+
+  careerPanelTitle: string
+  careerTopProfs: string
+  careerNoData: string
+
+  reportTitle: string
+  reportPrint: string
+  reportStats: string
+  reportTasks: string
+  reportBadges: string
+  reportCompetencies: string
+  reportDisc: string
+  reportCareer: string
+  reportObservations: string
+  reportLevel: string
+  reportXP: string
+  reportEngagement: string
+  reportMentor: string
+  reportMentorDesc: string
+  reportFooter: string
+
+  aiTitle: string
+  aiGenerating: string
+  aiInsights: string
+  aiNoData: string
+  aiGenerate: string
 }
 
 const ru: Translations = {
@@ -408,6 +480,78 @@ const ru: Translations = {
   dailyBonusFreezeCount: 'Заморозок: {count}',
   dailyBonusComeback: 'Бонус возвращения! 2x XP',
   dailyBonusStreakFreezeUsed: 'Заморозка серии использована!',
+
+  navShifts: 'Смены',
+  navObservations: 'Наблюдения',
+  navReport: 'Отчёт',
+
+  shiftManagerTitle: 'Управление сменами',
+  shiftCreate: 'Создать смену',
+  shiftName: 'Название',
+  shiftStart: 'Начало',
+  shiftEnd: 'Конец',
+  shiftStudents: 'Участники',
+  shiftEmpty: 'Пока нет смен',
+  shiftSquads: 'Отряды',
+  shiftSquadCreate: 'Создать отряд',
+  shiftSquadName: 'Название отряда',
+  shiftAssignStudent: 'Добавить участника',
+  shiftRemoveStudent: 'Убрать',
+  shiftNoStudents: 'Нет участников',
+  shiftAllStudents: 'Все участники',
+  shiftAssigned: 'Распределены',
+
+  obsTitle: 'Журнал наблюдений',
+  obsSelectStudent: 'Выберите участника',
+  obsSelectDay: 'День',
+  obsSelectTrack: 'Трек',
+  obsIndependence: 'Независимость',
+  obsQuality: 'Качество',
+  obsInitiative: 'Инициатива',
+  obsNotes: 'Заметки',
+  obsSave: 'Сохранить',
+  obsSaved: 'Наблюдение сохранено!',
+  obsCount: 'Наблюдений',
+  obsHistory: 'История наблюдений',
+  obsDay: 'День',
+  obsTrack: 'Трек',
+  obsScore: 'Оценка',
+
+  radarTitle: 'Карта компетенций',
+  radarCompetencies: '12 компетенций',
+
+  discTitle: 'DISC-профиль',
+  discDominant: 'Доминантный тип',
+  discType_D: 'Доминантный (D)',
+  discType_I: 'Влиятельный (I)',
+  discType_S: 'Стабильный (S)',
+  discType_C: 'Сознательный (C)',
+
+  careerPanelTitle: 'Профессиональные рекомендации',
+  careerTopProfs: 'Топ-5 профессий',
+  careerNoData: 'Добавьте наблюдения для анализа',
+
+  reportTitle: 'Полный отчёт участника',
+  reportPrint: 'Сохранить в PDF',
+  reportStats: 'Статистика',
+  reportTasks: 'Задания',
+  reportBadges: 'Достижения',
+  reportCompetencies: 'Компетенции',
+  reportDisc: 'DISC-профиль',
+  reportCareer: 'Карьерные рекомендации',
+  reportObservations: 'Журнал наблюдений',
+  reportLevel: 'Уровень',
+  reportXP: 'Опыт',
+  reportEngagement: 'Вовлечённость',
+  reportMentor: 'Вывод наставника',
+  reportMentorDesc: 'AI-анализ профиля участника',
+  reportFooter: 'ONE! Profile · Отчёт сгенерирован',
+
+  aiTitle: 'AI-Наставник',
+  aiGenerating: 'Анализ...',
+  aiInsights: 'Выводы AI',
+  aiNoData: 'Добавьте наблюдения для AI-анализа',
+  aiGenerate: 'Сгенерировать вывод',
 }
 
 const en: Translations = {
@@ -613,6 +757,78 @@ const en: Translations = {
   dailyBonusFreezeCount: 'Freezes: {count}',
   dailyBonusComeback: 'Comeback Bonus! 2x XP',
   dailyBonusStreakFreezeUsed: 'Streak Freeze used!',
+
+  navShifts: 'Shifts',
+  navObservations: 'Observations',
+  navReport: 'Report',
+
+  shiftManagerTitle: 'Shift Manager',
+  shiftCreate: 'Create Shift',
+  shiftName: 'Name',
+  shiftStart: 'Start',
+  shiftEnd: 'End',
+  shiftStudents: 'Students',
+  shiftEmpty: 'No shifts yet',
+  shiftSquads: 'Squads',
+  shiftSquadCreate: 'Create Squad',
+  shiftSquadName: 'Squad Name',
+  shiftAssignStudent: 'Add Student',
+  shiftRemoveStudent: 'Remove',
+  shiftNoStudents: 'No students',
+  shiftAllStudents: 'All students',
+  shiftAssigned: 'Assigned',
+
+  obsTitle: 'Observation Log',
+  obsSelectStudent: 'Select a student',
+  obsSelectDay: 'Day',
+  obsSelectTrack: 'Track',
+  obsIndependence: 'Independence',
+  obsQuality: 'Quality',
+  obsInitiative: 'Initiative',
+  obsNotes: 'Notes',
+  obsSave: 'Save',
+  obsSaved: 'Observation saved!',
+  obsCount: 'Observations',
+  obsHistory: 'Observation History',
+  obsDay: 'Day',
+  obsTrack: 'Track',
+  obsScore: 'Score',
+
+  radarTitle: 'Competency Map',
+  radarCompetencies: '12 Competencies',
+
+  discTitle: 'DISC Profile',
+  discDominant: 'Dominant Type',
+  discType_D: 'Dominant (D)',
+  discType_I: 'Influential (I)',
+  discType_S: 'Steady (S)',
+  discType_C: 'Conscientious (C)',
+
+  careerPanelTitle: 'Career Recommendations',
+  careerTopProfs: 'Top 5 Professions',
+  careerNoData: 'Add observations to analyze',
+
+  reportTitle: 'Full Student Report',
+  reportPrint: 'Save as PDF',
+  reportStats: 'Statistics',
+  reportTasks: 'Tasks',
+  reportBadges: 'Achievements',
+  reportCompetencies: 'Competencies',
+  reportDisc: 'DISC Profile',
+  reportCareer: 'Career Recommendations',
+  reportObservations: 'Observation Journal',
+  reportLevel: 'Level',
+  reportXP: 'Experience',
+  reportEngagement: 'Engagement',
+  reportMentor: 'Mentor Conclusion',
+  reportMentorDesc: 'AI analysis of student profile',
+  reportFooter: 'ONE! Profile · Report generated',
+
+  aiTitle: 'AI Mentor',
+  aiGenerating: 'Analyzing...',
+  aiInsights: 'AI Insights',
+  aiNoData: 'Add observations for AI analysis',
+  aiGenerate: 'Generate insight',
 }
 
 const translations: Record<Locale, Translations> = { ru, en }

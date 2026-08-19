@@ -4,8 +4,10 @@ import { levelFromXp, xpInLevel, xpToNextLevel, getShipStage } from './lib/engin
 import { useAppData } from './lib/useAppData'
 import { setStudentPerks } from './lib/profile'
 import { purchaseShipItem, performPrestige, evaluateBadges } from './lib/currency'
+import { computeCompetencyScores, computeDISC, scoreProfessions, getReportLevel } from './lib/skills-report-config'
+import { supabase } from './lib/supabase'
 import type { Locale } from './lib/i18n'
-import type { Direction } from './types/database'
+import type { Direction, Observation } from './types/database'
 
 import { AuthScreen } from './components/AuthScreen'
 import { ShipVisual } from './components/ShipVisual'
@@ -28,8 +30,11 @@ import { ShipEvolutionUI } from './components/ShipEvolutionUI'
 import { TutorialSystem } from './components/TutorialSystem'
 import { MysteryBox } from './components/MysteryBox'
 import { NotificationSystem, useNotifications } from './components/NotificationSystem'
+import { ShiftManager } from './components/ShiftManager'
+import { ObservationLog } from './components/ObservationLog'
+import { StudentReport } from './components/StudentReport'
 
-type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm' | 'more'
+type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm' | 'shifts' | 'observations' | 'more'
 
 const tabs: { id: Tab; icon: string; label: string }[] = [
   { id: 'profile', icon: '👤', label: t('navProfile') },
@@ -43,12 +48,14 @@ const tabs: { id: Tab; icon: string; label: string }[] = [
   { id: 'ship', icon: '🚀', label: t('navShip') },
   { id: 'prestige', icon: '⭐', label: t('navPrestige') },
   { id: 'gm', icon: '🎮', label: t('navGM') },
+  { id: 'shifts', icon: '🏕️', label: t('navShifts') },
+  { id: 'observations', icon: '📝', label: t('navObservations') },
   { id: 'more', icon: '⋯', label: t('navMore') },
 ]
 
 const PRIMARY_TABS: Tab[] = ['profile', 'missions', 'squad', 'badges', 'more']
 
-const OVERFLOW_TABS: Tab[] = ['sport', 'projects', 'directions', 'perks', 'ship', 'prestige', 'gm']
+const OVERFLOW_TABS: Tab[] = ['sport', 'projects', 'directions', 'perks', 'ship', 'prestige', 'gm', 'shifts', 'observations']
 
 function App() {
   const { user, studentId, student, skills, loading, error, refetch, signOut } = useAppData()
@@ -62,6 +69,9 @@ function App() {
   const moreDrawerRef = useRef<HTMLDivElement>(null)
   const badgesEvaluatedRef = useRef(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
+  const [showReport, setShowReport] = useState(false)
+  const [myObservations, setMyObservations] = useState<Observation[]>([])
+  const [allStudents, setAllStudents] = useState<import('./types/database').Student[]>([])
 
   const totalXp = student?.total_xp || 0
   const level = levelFromXp(totalXp)
@@ -114,6 +124,18 @@ function App() {
     }
     prevLevelRef.current = level
   }, [level])
+
+  // Load observations for current user (for report)
+  useEffect(() => {
+    if (!sid) return
+    supabase.from('observations').select('*').eq('student_id', sid).then(({ data }) => setMyObservations(data || []))
+  }, [sid, refetch])
+
+  // Load all students for GM features
+  useEffect(() => {
+    if (!sid) return
+    supabase.from('students').select('*').then(({ data }) => setAllStudents(data || []))
+  }, [sid])
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -287,6 +309,21 @@ function App() {
 
           {/* Mystery Box — coin sink */}
           <MysteryBox studentId={sid} coins={coins} gems={gems} onOpened={refetch} />
+
+          {/* Full Report button */}
+          <button onClick={() => setShowReport(true)} className="w-full neon-card p-4 text-left">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl" style={{
+                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(178, 75, 243, 0.15))',
+              }}>
+                📄
+              </div>
+              <div>
+                <h3 className="font-bold">{t('reportTitle')}</h3>
+                <p className="text-xs" style={{ color: '#A0AAB8' }}>{t('radarTitle')} · {t('discTitle')} · {t('careerPanelTitle')}</p>
+              </div>
+            </div>
+          </button>
         </div>
       )
       case 'missions': return <MissionSystem studentId={sid} onMissionComplete={refetch} />
@@ -310,6 +347,8 @@ function App() {
           <SquadShip squadLevel={1} memberCount={0} />
         </div>
       )
+      case 'shifts': return <ShiftManager students={allStudents} />
+      case 'observations': return <ObservationLog students={allStudents} counselorId={sid} />
     }
   }
 
@@ -328,6 +367,19 @@ function App() {
     <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
       <a href="#main-content" className="skip-to-content">{t('loading') === 'Загрузка...' ? 'Перейти к содержимому' : 'Skip to content'}</a>
       <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
+
+      {/* Report overlay */}
+      {showReport && student && (
+        <StudentReport
+          student={student}
+          observations={myObservations}
+          competencyScores={computeCompetencyScores(myObservations)}
+          disc={computeDISC(computeCompetencyScores(myObservations))}
+          professions={scoreProfessions(computeCompetencyScores(myObservations), myObservations)}
+          level={getReportLevel(myObservations.length, 0)}
+          onClose={() => setShowReport(false)}
+        />
+      )}
 
       {/* Level-Up Celebration Overlay */}
       {showLevelUp && (

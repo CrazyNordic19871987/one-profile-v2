@@ -142,3 +142,45 @@ export interface StudentProfile extends Student {
   prestige_count: number
   prestige_constellation: string | null
 }
+
+export interface Observation {
+  id: string
+  student_id: string
+  day: number
+  track: string
+  independence: number
+  quality: number
+  initiative: boolean
+  notes: string | null
+  counselor_id: string | null
+  created_at: string
+}
+
+export interface CampShift {
+  id: string
+  name: string
+  start_date: string | null
+  end_date: string | null
+  created_at: string
+}
+
+export interface CampShiftMember {
+  id: string
+  shift_id: string
+  student_id: string
+  joined_at: string
+}
+
+export interface CampSquad {
+  id: string
+  name: string
+  shift_id: string
+  created_at: string
+}
+
+export interface CampSquadMember {
+  id: string
+  squad_id: string
+  student_id: string
+  joined_at: string
+}
