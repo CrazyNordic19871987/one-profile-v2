@@ -7,6 +7,7 @@ import { purchaseShipItem, performPrestige, evaluateBadges } from './lib/currenc
 import type { Locale } from './lib/i18n'
 import type { Direction } from './types/database'
 
+import { AuthScreen } from './components/AuthScreen'
 import { ShipVisual } from './components/ShipVisual'
 import { SkillRadar } from './components/SkillRadar'
 import { MissionSystem } from './components/MissionSystem'
@@ -49,7 +50,7 @@ const PRIMARY_TABS: Tab[] = ['profile', 'missions', 'squad', 'badges', 'more']
 const OVERFLOW_TABS: Tab[] = ['sport', 'projects', 'directions', 'perks', 'ship', 'prestige', 'gm']
 
 function App() {
-  const { studentId, student, skills, loading, error, refetch } = useAppData()
+  const { user, studentId, student, skills, loading, error, refetch, signOut } = useAppData()
   const { notifications, addNotification, dismissNotification } = useNotifications()
   const [lang, setLang] = useState<Locale>(getLocale())
   const [activeTab, setActiveTab] = useState<Tab>('profile')
@@ -62,6 +63,11 @@ function App() {
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
     setLocale(newLang)
+  }
+
+  // Auth gate: show auth screen if not logged in
+  if (!loading && !user) {
+    return <AuthScreen onAuth={() => refetch()} />
   }
 
   const totalXp = student?.total_xp || 0
@@ -309,6 +315,14 @@ function App() {
             {t('tutorial')}
           </button>
           <button
+            onClick={() => signOut()}
+            className="flex-1 py-1.5 rounded text-xs text-cosmic-silver hover:text-status-error transition-colors"
+            style={{ background: 'rgba(30, 37, 56, 0.5)' }}
+            title={lang === 'ru' ? 'Выйти' : 'Sign Out'}
+          >
+            {lang === 'ru' ? 'Выйти' : 'Sign Out'}
+          </button>
+          <button
             onClick={() => handleLangChange('ru')}
             className={`px-2 py-1.5 rounded text-xs font-bold transition-all ${
               lang === 'ru'
@@ -370,6 +384,13 @@ function App() {
                 } : {}}
               >
                 EN
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="px-1.5 py-0.5 rounded text-xs font-bold text-cosmic-silver hover:text-status-error transition-colors"
+                title={lang === 'ru' ? 'Выйти' : 'Sign Out'}
+              >
+                ⏻
               </button>
             </div>
           </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from './supabase'
+import type { User } from '@supabase/supabase-js'
 import type { Student, Skill } from '../types/database'
 
 interface AppState {
+  user: User | null
   studentId: string | null
   student: Student | null
   skills: Skill[]
@@ -10,10 +12,9 @@ interface AppState {
   error: string | null
 }
 
-const DEMO_NAME = 'Space Explorer'
-
-export function useAppData(): AppState & { refetch: () => Promise<void> } {
+export function useAppData(): AppState & { refetch: () => Promise<void>; signOut: () => Promise<void> } {
   const [state, setState] = useState<AppState>({
+    user: null,
     studentId: null,
     student: null,
     skills: [],
@@ -25,20 +26,29 @@ export function useAppData(): AppState & { refetch: () => Promise<void> } {
     try {
       setState(s => ({ ...s, loading: true, error: null }))
 
-      // Try to find existing student
+      // Get authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+      if (authError || !user) {
+        setState({ user: null, studentId: null, student: null, skills: [], loading: false, error: null })
+        return
+      }
+
+      // Find or create student profile linked to auth user
       let { data: student } = await supabase
         .from('students')
         .select('*')
-        .order('created_at', { ascending: true })
-        .limit(1)
+        .eq('id', user.id)
         .maybeSingle()
 
-      // Auto-create demo student if none exists
+      // Auto-create student profile if none exists
       if (!student) {
+        const displayName = user.user_metadata?.name || user.email?.split('@')[0] || 'Space Explorer'
         const { data: created, error: createError } = await supabase
           .from('students')
           .insert({
-            name: DEMO_NAME,
+            id: user.id,
+            name: displayName,
             class: 'Scout',
             total_xp: 0,
             coins: 0,
@@ -62,6 +72,7 @@ export function useAppData(): AppState & { refetch: () => Promise<void> } {
         .eq('student_id', student.id)
 
       setState({
+        user,
         studentId: student.id,
         student,
         skills: skills || [],
@@ -77,9 +88,25 @@ export function useAppData(): AppState & { refetch: () => Promise<void> } {
     }
   }, [])
 
+  const handleSignOut = useCallback(async () => {
+    await supabase.auth.signOut()
+    setState({ user: null, studentId: null, student: null, skills: [], loading: false, error: null })
+  }, [])
+
   useEffect(() => {
     load()
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        load()
+      } else {
+        setState({ user: null, studentId: null, student: null, skills: [], loading: false, error: null })
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [load])
 
-  return { ...state, refetch: load }
+  return { ...state, refetch: load, signOut: handleSignOut }
 }
