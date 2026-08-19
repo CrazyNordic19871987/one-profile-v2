@@ -1,19 +1,20 @@
 -- ============================================================
 -- ONE! Profile v2 — Skills Report migration
 -- Run in Supabase SQL Editor after migrate-v2-safe.sql
+-- NOTE: students.id is TEXT type, so FK columns must also be TEXT
 -- ============================================================
 
 -- 1. Observations table (GM logs per student per day/track)
 CREATE TABLE IF NOT EXISTS observations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  student_id uuid REFERENCES students(id) ON DELETE CASCADE,
+  student_id text NOT NULL,
   day integer CHECK (day BETWEEN 1 AND 10) NOT NULL,
   track text CHECK (track IN ('bio','eng','media','english','dev','design','sport','science','art','music','community')) NOT NULL,
   independence integer CHECK (independence BETWEEN 1 AND 5) DEFAULT 3,
   quality integer CHECK (quality BETWEEN 1 AND 5) DEFAULT 3,
   initiative boolean DEFAULT false,
   notes text,
-  counselor_id uuid,
+  counselor_id text,
   created_at timestamptz DEFAULT now()
 );
 
@@ -28,27 +29,28 @@ CREATE TABLE IF NOT EXISTS camp_shifts (
   created_at timestamptz DEFAULT now()
 );
 
--- 3. Shift members — which students belong to which shift
+-- 3. Shift members
 CREATE TABLE IF NOT EXISTS camp_shift_members (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shift_id uuid REFERENCES camp_shifts(id) ON DELETE CASCADE,
-  student_id uuid REFERENCES students(id) ON DELETE CASCADE,
+  shift_id uuid NOT NULL,
+  student_id text NOT NULL,
   joined_at timestamptz DEFAULT now(),
   UNIQUE(shift_id, student_id)
 );
 
--- 4. Squad assignment within a shift
+-- 4. Squads within a shift
 CREATE TABLE IF NOT EXISTS camp_squads (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
-  shift_id uuid REFERENCES camp_shifts(id) ON DELETE CASCADE,
+  shift_id uuid NOT NULL,
   created_at timestamptz DEFAULT now()
 );
 
+-- 5. Squad members
 CREATE TABLE IF NOT EXISTS camp_squad_members (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  squad_id uuid REFERENCES camp_squads(id) ON DELETE CASCADE,
-  student_id uuid REFERENCES students(id) ON DELETE CASCADE,
+  squad_id uuid NOT NULL,
+  student_id text NOT NULL,
   joined_at timestamptz DEFAULT now(),
   UNIQUE(squad_id, student_id)
 );
@@ -60,7 +62,7 @@ ALTER TABLE camp_shift_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE camp_squads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE camp_squad_members ENABLE ROW LEVEL SECURITY;
 
--- Public read/write (same as other tables)
+-- Public read/write
 CREATE POLICY "Public read observations" ON observations FOR SELECT USING (true);
 CREATE POLICY "Public insert observations" ON observations FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update observations" ON observations FOR UPDATE USING (true);
