@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { t, setLocale, getLocale } from './lib/i18n'
 import { levelFromXp, xpInLevel, xpToNextLevel, getShipStage } from './lib/engine'
 import { useAppData } from './lib/useAppData'
+import { setStudentPerks } from './lib/profile'
+import { purchaseShipItem, performPrestige, evaluateBadges } from './lib/currency'
 import type { Locale } from './lib/i18n'
 import type { Direction } from './types/database'
 
@@ -23,6 +25,7 @@ import { SquadShip } from './components/SquadShip'
 import { LeaderboardUI } from './components/LeaderboardUI'
 import { ShipEvolutionUI } from './components/ShipEvolutionUI'
 import { TutorialSystem } from './components/TutorialSystem'
+import { NotificationSystem, useNotifications } from './components/NotificationSystem'
 
 type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm'
 
@@ -42,6 +45,7 @@ const tabs: { id: Tab; icon: string; label: string }[] = [
 
 function App() {
   const { studentId, student, skills, loading, error, refetch } = useAppData()
+  const { notifications, addNotification, dismissNotification } = useNotifications()
   const [lang, setLang] = useState<Locale>(getLocale())
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null)
@@ -116,6 +120,13 @@ function App() {
   const sid = studentId!
   const s = student!
 
+  // Evaluate badges on load
+  useEffect(() => {
+    evaluateBadges(sid).then(newBadges => {
+      newBadges.forEach(name => addNotification('success', `${lang === 'ru' ? 'Бейдж получен' : 'Badge earned'}: ${name}`))
+    }).catch(() => {})
+  }, [sid])
+
   function renderContent() {
     switch (activeTab) {
       case 'profile': return (
@@ -189,14 +200,14 @@ function App() {
       case 'projects': return <ProjectTracker studentId={sid} onProjectComplete={refetch} />
       case 'directions': return <DirectionSystem skills={skills} selectedDirection={selectedDirection} onSelectDirection={setSelectedDirection} />
       case 'badges': return <BadgeSystem studentId={sid} />
-      case 'perks': return <PerkSystem currentPerks={currentPerks} onPerksChange={() => refetch()} />
+      case 'perks': return           <PerkSystem currentPerks={currentPerks} onPerksChange={async (perks) => { await setStudentPerks(sid, perks); refetch() }} />
       case 'ship': return (
         <div className="space-y-4 animate-fade-in">
           <ShipEvolutionUI level={level} />
-          <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={() => refetch()} />
+          <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={async (itemId, cost, currency) => { await purchaseShipItem(sid, itemId, cost, currency); refetch() }} />
         </div>
       )
-      case 'prestige': return <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={refetch} />
+      case 'prestige': return <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={async () => { await performPrestige(sid); refetch() }} />
       case 'gm': return (
         <div className="space-y-4 animate-fade-in">
           <GMGradingWorkflow gmId={sid} />
@@ -211,6 +222,7 @@ function App() {
 
   return (
     <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
+      <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-56 lg:w-64 border-r border-space-border flex-shrink-0" style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}>
         {/* Logo */}

@@ -89,7 +89,7 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
                 : 'bg-space-gray text-cosmic-silver hover:bg-space-border'
             }`}
           >
-            {cat === 'all' ? t('navDirections') : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            {cat === 'all' ? t('shipAll') : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
         ))}
       </div>

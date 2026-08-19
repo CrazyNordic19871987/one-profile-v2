@@ -75,7 +75,7 @@ export function TutorialSystem({ onComplete }: TutorialSystemProps) {
         {/* Progress */}
         <div className="mb-6">
           <div className="flex justify-between text-sm mb-1">
-            <span>Tutorial</span>
+            <span>{t('tutorial')}</span>
             <span className="font-mono text-plasma-cyan">{currentStep + 1}/{TUTORIAL_STEPS.length}</span>
           </div>
           <div className="h-2 bg-space-gray rounded-full overflow-hidden">

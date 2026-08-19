@@ -89,7 +89,7 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
                     {entry.name}
                     {isCurrentStudent && (
                       <span className="text-xs ml-2 px-2 py-0.5 rounded-full bg-plasma-cyan/10 text-plasma-cyan font-mono">
-                        YOU
+                        {t('leaderboardYou')}
                       </span>
                     )}
                   </div>

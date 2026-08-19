@@ -63,6 +63,7 @@ export interface Translations {
   shipNext: string
   shipUnlocksAt: string
   shipOwned: string
+  shipAll: string
 
   missionsTitle: string
   missionsPending: string
@@ -248,6 +249,7 @@ const ru: Translations = {
   shipNext: 'Далее:',
   shipUnlocksAt: 'Откроется на уровне',
   shipOwned: 'Куплено',
+  shipAll: 'Все',
 
   missionsTitle: 'Миссии',
   missionsPending: 'Ожидают',
@@ -433,6 +435,7 @@ const en: Translations = {
   shipNext: 'Next:',
   shipUnlocksAt: 'Unlocks at level',
   shipOwned: 'Owned',
+  shipAll: 'All',
 
   missionsTitle: 'Missions',
   missionsPending: 'Pending',

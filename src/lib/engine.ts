@@ -130,7 +130,8 @@ export function rewardOf(grade: 1 | 2 | 3 | 4 | 5, type: 'mission' | 'sport' | '
 
 // === Direction XP ===
 
-export function directionXpGain(_direction: Direction, intensity: 'low' | 'medium' | 'high'): number {
+export function directionXpGain(direction: Direction, intensity: 'low' | 'medium' | 'high'): number {
+  void direction
   const base: Record<string, number> = {
     low: 5,
     medium: 10,

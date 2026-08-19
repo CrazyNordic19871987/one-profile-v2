@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { DIRECTIONS } from '../lib/engine'
+import { t, getLocale } from '../lib/i18n'
 import type { Direction } from '../types/database'
 
 interface CareerTestProps {
@@ -87,6 +88,7 @@ export function CareerTest({ onComplete }: CareerTestProps) {
   const [answers, setAnswers] = useState<Direction[]>([])
   const [showResult, setShowResult] = useState(false)
   const [recommended, setRecommended] = useState<Direction | null>(null)
+  const lang = getLocale()
 
   function handleAnswer(direction: Direction) {
     const newAnswers = [...answers, direction]
@@ -95,7 +97,6 @@ export function CareerTest({ onComplete }: CareerTestProps) {
     if (currentQuestion < QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
-      // Calculate result
       const counts: Record<Direction, number> = {
         strategy: 0, language: 0, communication: 0, sport: 0,
         it: 0, art: 0, entrepreneurship: 0,
@@ -120,20 +121,25 @@ export function CareerTest({ onComplete }: CareerTestProps) {
   if (showResult && recommended) {
     const dir = DIRECTIONS.find(d => d.id === recommended)
     return (
-      <div className="bg-space-nebula rounded-xl p-6 border border-space-border text-center">
+      <div className="neon-card p-6 text-center scanlines">
         <div className="text-6xl mb-4">{dir?.icon}</div>
-        <h2 className="text-2xl font-bold mb-2">Your Path: {dir?.name}</h2>
+        <h2 className="text-2xl font-bold mb-2 neon-text-cyan">
+          {lang === 'ru' ? 'Твой путь: ' : 'Your Path: '}{lang === 'ru' ? dir?.name : dir?.nameEn}
+        </h2>
         <p className="text-cosmic-silver mb-6">
-          Based on your answers, you should focus on <strong>{dir?.name}</strong>!
+          {lang === 'ru' ? 'По твоим ответам, стоит сосредоточиться на ' : 'Based on your answers, you should focus on '}
+          <strong className="neon-text-cyan">{lang === 'ru' ? dir?.name : dir?.nameEn}</strong>!
         </p>
-        <div className="bg-space-gray rounded-lg p-4 mb-6">
-          <div className="text-sm text-cosmic-silver mb-2">Your answers showed:</div>
+        <div className="bg-space-gray/50 rounded-lg p-4 mb-6">
+          <div className="text-sm text-cosmic-silver mb-2">
+            {lang === 'ru' ? 'Твои ответы показали:' : 'Your answers showed:'}
+          </div>
           <div className="flex flex-wrap justify-center gap-2">
             {[...new Set(answers)].map((a, i) => {
               const d = DIRECTIONS.find(dd => dd.id === a)
               return (
                 <span key={i} className="px-2 py-1 bg-space-border rounded text-sm">
-                  {d?.icon} {d?.name}
+                  {d?.icon} {lang === 'ru' ? d?.name : d?.nameEn}
                 </span>
               )
             })}
@@ -141,9 +147,14 @@ export function CareerTest({ onComplete }: CareerTestProps) {
         </div>
         <button
           onClick={handleFinish}
-          className="px-6 py-3 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors"
+          className="px-6 py-3 rounded-lg font-bold transition-all"
+          style={{
+            background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
+            color: '#0A0E1A',
+            boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
+          }}
         >
-          Start Your Journey
+          {lang === 'ru' ? 'Начать путешествие' : 'Start Your Journey'}
         </button>
       </div>
     )
@@ -153,22 +164,26 @@ export function CareerTest({ onComplete }: CareerTestProps) {
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100
 
   return (
-    <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
+    <div className="neon-card p-6 scanlines">
       <div className="mb-6">
         <div className="flex justify-between text-sm mb-1">
-          <span>Career Test</span>
-          <span className="font-mono text-plasma-cyan">{currentQuestion + 1}/{QUESTIONS.length}</span>
+          <span>{t('careerTitle')}</span>
+          <span className="font-mono neon-text-cyan">{currentQuestion + 1}/{QUESTIONS.length}</span>
         </div>
-        <div className="h-2 bg-space-gray rounded-full overflow-hidden">
+        <div className="h-2 bg-space-deep rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-plasma-cyan to-status-success rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${progress}%`,
+              background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
+              boxShadow: '0 0 8px rgba(0, 212, 255, 0.5)',
+            }}
           />
         </div>
       </div>
 
       <h2 className="text-xl font-bold mb-6 text-center">
-        {question.text}
+        {lang === 'ru' ? question.text : question.textEn}
       </h2>
 
       <div className="grid gap-3">
@@ -176,9 +191,9 @@ export function CareerTest({ onComplete }: CareerTestProps) {
           <button
             key={option.value}
             onClick={() => handleAnswer(option.value)}
-            className="p-4 bg-space-gray rounded-lg border border-space-border hover:border-plasma-cyan hover:bg-space-border transition-all text-left"
+            className="neon-card p-4 text-left transition-all"
           >
-            {option.label}
+            {lang === 'ru' ? option.label : option.labelEn}
           </button>
         ))}
       </div>

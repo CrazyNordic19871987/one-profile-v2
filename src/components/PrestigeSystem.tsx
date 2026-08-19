@@ -9,7 +9,7 @@ interface PrestigeSystemProps {
 }
 
 const CONSTELLATIONS = [
-  { name: 'Orion', icon: ' Orion', bonus: '1.1x XP' },
+  { name: 'Orion', icon: '⭐', bonus: '1.1x XP' },
   { name: 'Andromeda', icon: '🌌', bonus: '1.2x XP' },
   { name: 'Cassiopeia', icon: '✨', bonus: '1.3x XP' },
   { name: 'Lyra', icon: '🎵', bonus: '1.4x XP' },

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { t } from '../lib/i18n'
+import { levelFromXp, getShipStage } from '../lib/engine'
 import type { Squad, SquadMember, Student } from '../types/database'
 
 interface SquadSystemProps {
@@ -116,7 +117,7 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
         <div className="text-6xl mb-2">🚀</div>
         <div className="text-sm text-cosmic-silver">{t('squadShip')}</div>
         <div className="font-mono text-plasma-cyan">
-          Stage: {getSquadLevel() >= 10 ? 'Explorer' : 'Scout Pod'}
+          {getShipStage(getSquadLevel())}
         </div>
       </div>
 
@@ -144,7 +145,7 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
                 <div>
                   <div className="font-medium">{member.student?.name || t('squadUnknown')}</div>
                   <div className="text-xs text-cosmic-silver">
-                    {t('level')} {member.student?.total_xp ? Math.floor(member.student.total_xp / 100) + 1 : 1}
+                    {t('level')} {levelFromXp(member.student?.total_xp || 0)}
                   </div>
                 </div>
               </div>
