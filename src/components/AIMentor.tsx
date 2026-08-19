@@ -104,20 +104,20 @@ Keep it encouraging. Write in Russian.`
       <h3 className="text-sm font-bold">🤖 {t('aiTitle')}</h3>
 
       {showKeyInput && (
-        <div className="p-3 rounded-lg bg-space-gray border border-space-border space-y-2">
-          <p className="text-xs text-cosmic-silver">OpenAI API Key (sk-proj-...)</p>
+        <div className="gc p-3 space-y-2">
+          <p className="text-xs" style={{ color: 'var(--color-muted)' }}>OpenAI API Key (sk-proj-...)</p>
           <div className="flex gap-2">
             <input
               type="password"
               value={keyValue}
               onChange={e => setKeyValue(e.target.value)}
               placeholder="sk-proj-..."
-              className="flex-1 px-3 py-1.5 rounded bg-space-deep border border-space-border text-white text-xs"
+              className="input flex-1 px-3 py-1.5 rounded text-xs"
             />
-            <button onClick={saveKey} className="px-3 py-1.5 rounded text-xs font-bold" style={{ background: '#00D4FF', color: '#0A0E1A' }}>
+            <button onClick={saveKey} className="btn-accent px-3 py-1.5 rounded text-xs font-bold">
               {t('save')}
             </button>
-            <button onClick={() => setShowKeyInput(false)} className="px-2 py-1.5 text-xs text-cosmic-silver">{t('cancel')}</button>
+            <button onClick={() => setShowKeyInput(false)} className="px-2 py-1.5 text-xs" style={{ color: 'var(--color-muted)' }}>{t('cancel')}</button>
           </div>
         </div>
       )}
@@ -126,32 +126,34 @@ Keep it encouraging. Write in Russian.`
         <button
           onClick={generateInsight}
           disabled={loading}
-          className="w-full py-2.5 rounded-lg text-sm font-bold transition-all"
-          style={{ background: 'linear-gradient(135deg, #B24BF3, #FF2D78)', color: '#fff', opacity: loading ? 0.6 : 1 }}
+          className="btn-accent w-full py-2.5 rounded-lg text-sm font-bold transition-all"
+          style={{ opacity: loading ? 0.6 : 1 }}
         >
           {loading ? '🔄...' : `✨ ${t('aiGenerate')}`}
         </button>
       )}
 
       {obsCount === 0 && !loading && !showKeyInput && !insight && (
-        <p className="text-xs text-cosmic-silver text-center">{t('aiNoData')}</p>
+        <p className="text-xs text-center" style={{ color: 'var(--color-muted)' }}>{t('aiNoData')}</p>
       )}
 
       {error && <p className="text-xs text-status-error">{error}</p>}
 
       {insight && (
-        <div className="p-4 rounded-lg neon-card">
-          <p className="text-sm leading-relaxed" style={{ color: '#E8F0FE' }}>{insight}</p>
+        <div className="gc p-4">
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--color-white)' }}>{insight}</p>
           <div className="flex gap-3 mt-2">
             <button
               onClick={() => { setInsight(null); setError(null) }}
-              className="text-xs neon-text-cyan"
+              className="text-xs"
+              style={{ color: 'var(--color-accent)' }}
             >
               ✨ {t('aiGenerate')} снова
             </button>
             <button
               onClick={() => setShowKeyInput(true)}
-              className="text-xs text-cosmic-silver"
+              className="text-xs"
+              style={{ color: 'var(--color-muted)' }}
             >
               🔑 API Key
             </button>

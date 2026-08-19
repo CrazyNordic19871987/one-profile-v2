@@ -100,7 +100,7 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
@@ -108,27 +108,23 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
   const percent = badges.length > 0 ? Math.round((earnedBadges.length / badges.length) * 100) : 0
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 page-enter">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold neon-text-cyan">{t('badgesTitle')}</h2>
-        <div className="text-sm text-cosmic-silver font-mono">
+        <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>{t('badgesTitle')}</h2>
+        <div className="text-sm font-mono" style={{ color: 'var(--color-muted)' }}>
           {earnedBadges.length} / {badges.length}
         </div>
       </div>
 
-      <div className="neon-card p-4 scanlines">
+      <div className="gc p-4">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-cosmic-silver">{t('badgesCollection')}</span>
-          <span className="font-mono neon-text-cyan">{percent}%</span>
+          <span style={{ color: 'var(--color-muted)' }}>{t('badgesCollection')}</span>
+          <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{percent}%</span>
         </div>
-        <div className="h-2 bg-space-deep rounded-full overflow-hidden">
+        <div className="progress-bar">
           <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
-            style={{
-              width: `${percent}%`,
-              background: 'linear-gradient(90deg, #00D4FF, #B24BF3, #FF2D78)',
-              boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
-            }}
+            className="progress-bar-fill"
+            style={{ width: `${percent}%` }}
           />
         </div>
       </div>
@@ -149,9 +145,9 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
               <div className="badge-glow-ring" />
 
               <div
-                className={`neon-card p-4 text-center transition-all ${
+                className={`gc p-4 text-center transition-all ${
                   earned
-                    ? 'neon-glow-cyan'
+                    ? ''
                     : isHidden
                       ? 'opacity-40 hover:opacity-60'
                       : 'opacity-50 grayscale hover:opacity-80 hover:grayscale-[50%]'
@@ -167,11 +163,8 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
                   }`}
                   style={{
                     background: earned
-                      ? `linear-gradient(135deg, ${rarityConfig.color}25, ${rarityConfig.color}15)`
-                      : 'rgba(30, 37, 56, 0.8)',
-                    boxShadow: earned
-                      ? `0 0 20px ${rarityConfig.glow}, inset 0 0 20px ${rarityConfig.color}15`
-                      : 'none',
+                      ? `${rarityConfig.color}18`
+                      : 'var(--color-glass-b)',
                   }}
                 >
                   <span className={`${earned ? 'text-4xl' : 'text-3xl'}`}>
@@ -194,21 +187,21 @@ export function BadgeSystem({ studentId }: BadgeSystemProps) {
                   {lang === 'ru' ? rarityConfig.labelRu : rarityConfig.label}
                 </div>
 
-                <p className="text-xs text-cosmic-silver leading-tight mt-1">
+                <p className="text-xs leading-tight mt-1" style={{ color: 'var(--color-muted)' }}>
                   {isHidden ? 'Скрытое достижение' : badge.description}
                 </p>
 
                 {earned ? (
-                  <div className="mt-3 pt-3 border-t border-space-border">
-                    <span className="text-xs neon-text-green font-bold">✓ {t('badgesEarned')}</span>
+                  <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border)' }}>
+                    <span className="text-xs font-bold" style={{ color: 'var(--color-status-success)' }}>✓ {t('badgesEarned')}</span>
                     {earnedDate && (
-                      <div className="text-xs text-cosmic-silver mt-1 font-mono">{earnedDate}</div>
+                      <div className="text-xs mt-1 font-mono" style={{ color: 'var(--color-muted)' }}>{earnedDate}</div>
                     )}
                   </div>
                 ) : (
-                  <div className="mt-3 pt-3 border-t border-space-border">
-                    <span className="text-xs text-cosmic-silver">🔒 {t('badgesLocked')}</span>
-                    <div className="text-xs neon-text-warning font-mono mt-1">+{badge.xp_reward} XP</div>
+                  <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border)' }}>
+                    <span className="text-xs" style={{ color: 'var(--color-muted)' }}>🔒 {t('badgesLocked')}</span>
+                    <div className="text-xs font-mono mt-1" style={{ color: 'var(--color-status-warn)' }}>+{badge.xp_reward} XP</div>
                   </div>
                 )}
               </div>

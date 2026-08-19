@@ -33,17 +33,16 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">✨ {t('perksTitle')}</h2>
-        <div className="text-sm text-cosmic-silver">
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
           {currentPerks.length}/{MAX_PERKS} {t('perksActive')}
         </div>
       </div>
 
-      {/* Active Perks */}
-      <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
+      <div className="gc p-4">
         <h3 className="font-bold mb-3">{t('perksActive')}</h3>
         <div className="flex gap-2">
           {currentPerks.length === 0 ? (
-            <div className="text-sm text-cosmic-silver">{t('perksNoneActive')}</div>
+            <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('perksNoneActive')}</div>
           ) : (
             currentPerks.map(perkId => {
               const perk = AVAILABLE_PERKS.find(p => p.id === perkId)
@@ -51,13 +50,15 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
               return (
                 <div
                   key={perk.id}
-                  className="flex items-center gap-2 px-3 py-2 bg-plasma-cyan/20 rounded-lg border border-plasma-cyan"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+                  style={{ background: 'var(--color-accent-dim)', borderColor: 'var(--color-accent)' }}
                 >
                   <span>{perk.icon}</span>
                   <span className="text-sm">{perk.name}</span>
                   <button
                     onClick={() => handleTogglePerk(perk.id)}
-                    className="text-cosmic-silver hover:text-status-error"
+                    className="hover:text-[var(--color-status-error)]"
+                    style={{ color: 'var(--color-muted)' }}
                   >
                     ×
                   </button>
@@ -68,7 +69,6 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
         </div>
       </div>
 
-      {/* Available Perks */}
       <div className="grid gap-3">
         {AVAILABLE_PERKS.map((perk) => {
           const active = isPerkActive(perk.id)
@@ -77,11 +77,13 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
           return (
             <div
               key={perk.id}
-              className={`bg-space-nebula rounded-lg p-4 border transition-all cursor-pointer ${
-                active
-                  ? 'border-plasma-cyan ring-2 ring-plasma-cyan/30'
-                  : 'border-space-border hover:border-plasma-cyan/50'
+              className={`gc p-4 transition-all cursor-pointer ${
+                active ? '' : 'hover:border-[var(--color-border-h)]'
               }`}
+              style={active ? {
+                borderColor: 'var(--color-accent)',
+                boxShadow: '0 0 0 2px var(--color-accent-dim)',
+              } : undefined}
               onClick={() => !active && canAdd && handleTogglePerk(perk.id)}
             >
               <div className="flex items-center justify-between">
@@ -89,15 +91,15 @@ export function PerkSystem({ currentPerks, onPerksChange }: PerkSystemProps) {
                   <span className="text-2xl">{perk.icon}</span>
                   <div>
                     <h4 className="font-bold">{perk.name}</h4>
-                    <p className="text-sm text-cosmic-silver">{perk.description}</p>
+                    <p className="text-sm" style={{ color: 'var(--color-muted)' }}>{perk.description}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className={`font-mono ${perk.type === 'gems' ? 'text-status-premium' : 'text-status-warning'}`}>
+                  <div className="font-mono" style={{ color: perk.type === 'gems' ? 'var(--color-accent)' : 'var(--color-status-warn)' }}>
                     {perk.cost} {perk.type === 'gems' ? '💎' : '💰'}
                   </div>
                   {active && (
-                    <div className="text-xs text-plasma-cyan">{t('perksActive')}</div>
+                    <div className="text-xs" style={{ color: 'var(--color-accent)' }}>{t('perksActive')}</div>
                   )}
                 </div>
               </div>

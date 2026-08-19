@@ -12,11 +12,11 @@ interface NotificationSystemProps {
   onDismiss: (id: string) => void
 }
 
-function getNotificationColor(type: Notification['type']): string {
+function getNotificationStyle(type: Notification['type']): React.CSSProperties {
   switch (type) {
-    case 'success': return 'border-status-success bg-status-success/10'
-    case 'warning': return 'border-status-warning bg-status-warning/10'
-    default: return 'border-plasma-cyan bg-plasma-cyan/10'
+    case 'success': return { background: 'var(--color-navy-dark)', borderColor: 'var(--color-status-success)' }
+    case 'warning': return { background: 'var(--color-navy-dark)', borderColor: 'var(--color-status-warn)' }
+    default: return { background: 'var(--color-navy-dark)', borderColor: 'var(--color-accent)' }
   }
 }
 
@@ -47,12 +47,17 @@ export function NotificationSystem({ notifications, onDismiss }: NotificationSys
       {notifications.map(notification => (
         <div
           key={notification.id}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${getNotificationColor(notification.type)} backdrop-blur-sm animate-fade-in cursor-pointer`}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-sm page-enter cursor-pointer"
+          style={getNotificationStyle(notification.type)}
           onClick={() => onDismiss(notification.id)}
         >
           <span>{getNotificationIcon(notification.type)}</span>
           <span className="text-sm flex-1">{notification.message}</span>
-          <button className="text-cosmic-silver hover:text-star-white text-sm" onClick={(e) => { e.stopPropagation(); onDismiss(notification.id) }}>
+          <button
+            className="hover:opacity-80 text-sm"
+            style={{ color: 'var(--color-muted)' }}
+            onClick={(e) => { e.stopPropagation(); onDismiss(notification.id) }}
+          >
             ×
           </button>
         </div>
@@ -63,7 +68,6 @@ export function NotificationSystem({ notifications, onDismiss }: NotificationSys
 
 export type { Notification }
 
-// Hook for using notifications anywhere
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
 

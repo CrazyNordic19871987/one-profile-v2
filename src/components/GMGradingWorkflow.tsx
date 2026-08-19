@@ -31,7 +31,6 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
   }
 
   async function handleGrade(completionId: string, studentId: string) {
-    // Step 1: Mark as graded
     const { error } = await supabase
       .from('mission_completions')
       .update({
@@ -44,7 +43,6 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
 
     if (error) return
 
-    // Step 2: Credit rewards (XP, coins, gems, direction skill)
     try {
       const completion = pendingCompletions.find(c => c.id === completionId)
       const direction = completion?.mission?.direction
@@ -52,7 +50,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
       setLastReward({ xp: reward.xp, coins: reward.coins, gems: reward.gems })
       setTimeout(() => setLastReward(null), 3000)
     } catch {
-      // Grading succeeded even if credit failed — can be retried manually
+      // Grading succeeded even if credit failed - can be retried manually
     }
 
     setSelectedCompletion(null)
@@ -61,9 +59,9 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
   }
 
   function getGradeColor(g: number): string {
-    if (g >= 4) return 'text-status-success'
-    if (g >= 3) return 'text-status-warning'
-    return 'text-status-error'
+    if (g >= 4) return 'var(--color-status-success)'
+    if (g >= 3) return 'var(--color-status-warn)'
+    return 'var(--color-status-error)'
   }
 
   function getGradeLabel(g: number): string {
@@ -80,7 +78,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
@@ -89,52 +87,53 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">📋 {t('gmTitle')}</h2>
-        <div className="text-sm text-cosmic-silver">
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
           {pendingCompletions.length} {t('gmPending')}
         </div>
       </div>
 
       {lastReward && (
-        <div className="bg-status-success/20 border border-status-success rounded-lg p-3 text-center animate-pulse">
-          <span className="text-sm font-bold text-status-success">
+        <div className="rounded-lg p-3 text-center animate-pulse" style={{ background: 'rgba(34, 211, 166, 0.1)', border: '1px solid var(--color-status-success)' }}>
+          <span className="text-sm font-bold" style={{ color: 'var(--color-status-success)' }}>
             ✅ +{lastReward.xp} XP · +{lastReward.coins} 💰{lastReward.gems > 0 ? ` · +${lastReward.gems} 💎` : ''}
           </span>
         </div>
       )}
 
       {pendingCompletions.length === 0 ? (
-        <div className="bg-space-nebula rounded-lg p-8 border border-space-border text-center">
+        <div className="rounded-lg p-8 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
           <div className="text-4xl mb-4">✅</div>
           <h3 className="font-bold mb-2">{t('gmAllCaughtUp')}</h3>
-          <p className="text-cosmic-silver">{t('gmNoMissions')}</p>
+          <p style={{ color: 'var(--color-muted)' }}>{t('gmNoMissions')}</p>
         </div>
       ) : (
         <div className="space-y-3">
           {pendingCompletions.map((completion) => (
             <div
               key={completion.id}
-              className="bg-space-nebula rounded-lg p-4 border border-space-border"
+              className="rounded-lg p-4"
+              style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span>{getDirectionIcon(completion.mission?.direction || 'it')}</span>
-                    <span className="text-sm text-cosmic-silver">
+                    <span className="text-sm" style={{ color: 'var(--color-muted)' }}>
                       {getDirectionName(completion.mission?.direction || 'it')}
                     </span>
                   </div>
                   <h3 className="font-bold">{completion.mission?.title || t('squadUnknown')}</h3>
-                  <p className="text-sm text-cosmic-silver mt-1">
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
                     {t('gmStudent')}: {completion.student?.nickname || t('squadUnknown')}
                   </p>
                 </div>
-                <div className="text-right text-sm text-cosmic-silver">
+                <div className="text-right text-sm" style={{ color: 'var(--color-muted)' }}>
                   {new Date(completion.created_at).toLocaleString()}
                 </div>
               </div>
 
               {selectedCompletion === completion.id ? (
-                <div className="bg-space-gray rounded-lg p-4">
+                <div className="rounded-lg p-4" style={{ background: 'var(--color-glass-b)' }}>
                   <div className="mb-4">
                     <label className="block text-sm mb-2">{t('gmGradeLabel')}</label>
                     <div className="flex gap-2">
@@ -144,15 +143,20 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                           onClick={() => setGrade(g as 1 | 2 | 3 | 4 | 5)}
                           className={`flex-1 py-2 rounded border ${
                             grade === g
-                              ? 'bg-plasma-cyan text-space-deep border-plasma-cyan'
-                              : 'bg-space-gray text-cosmic-silver border-space-border hover:border-plasma-cyan'
+                              ? 'btn-accent'
+                              : ''
                           }`}
+                          style={grade !== g ? {
+                            background: 'var(--color-glass-b)',
+                            color: 'var(--color-muted)',
+                            borderColor: 'var(--color-border)',
+                          } : undefined}
                         >
                           {g}
                         </button>
                       ))}
                     </div>
-                    <div className={`text-center mt-2 ${getGradeColor(grade)}`}>
+                    <div className="text-center mt-2" style={{ color: getGradeColor(grade) }}>
                       {getGradeLabel(grade)}
                     </div>
                   </div>
@@ -160,13 +164,13 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleGrade(completion.id, completion.student_id)}
-                      className="flex-1 py-2 bg-status-success text-space-deep rounded font-bold hover:opacity-90 transition-opacity"
+                      className="btn-accent flex-1 py-2 rounded font-bold"
                     >
                       {t('gmGrade')}
                     </button>
                     <button
                       onClick={() => { setSelectedCompletion(null); setGrade(3) }}
-                      className="px-4 py-2 bg-space-gray text-cosmic-silver rounded hover:bg-space-border transition-colors"
+                      className="btn-ghost px-4 py-2 rounded"
                     >
                       {t('cancel')}
                     </button>
@@ -175,7 +179,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
               ) : (
                 <button
                   onClick={() => setSelectedCompletion(completion.id)}
-                  className="w-full py-2 bg-plasma-cyan text-space-deep rounded font-bold hover:bg-plasma-blue transition-colors"
+                  className="btn-accent w-full py-2 rounded font-bold"
                 >
                   {t('gmGradeMission')}
                 </button>

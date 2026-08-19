@@ -27,11 +27,16 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
             <button
               key={dir.id}
               onClick={() => onSelectDirection?.(dir.id)}
-              className={`bg-space-nebula rounded-lg p-4 border transition-all text-left ${
+              className={`rounded-lg p-4 transition-all text-left ${
                 isSelected
-                  ? 'border-plasma-cyan ring-2 ring-plasma-cyan/30'
-                  : 'border-space-border hover:border-plasma-cyan/50'
+                  ? 'ring-2'
+                  : ''
               }`}
+              style={{
+                background: 'var(--color-navy-light)',
+                border: `1px solid ${isSelected ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                '--tw-ring-color': 'rgba(237, 118, 21, 0.3)',
+              } as React.CSSProperties}
             >
               <div className="flex items-center gap-3">
                 <div
@@ -43,20 +48,20 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
 
                 <div className="flex-1">
                   <div className="font-bold">{dir.name}</div>
-                  <div className="text-sm text-cosmic-silver">{t('level')} {skill.level}</div>
+                  <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('level')} {skill.level}</div>
                 </div>
 
                 <div className="text-right">
                   <div className="font-mono text-lg" style={{ color: dir.color }}>
                     {skill.xp}
                   </div>
-                  <div className="text-xs text-cosmic-silver">{t('xp')}</div>
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('xp')}</div>
                 </div>
               </div>
 
               {/* Progress Bar */}
               <div className="mt-3">
-                <div className="h-2 bg-space-gray rounded-full overflow-hidden">
+                <div className="progress-bar">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
@@ -69,8 +74,8 @@ export function DirectionSystem({ skills, selectedDirection, onSelectDirection }
 
               {/* Direction-specific info */}
               {isSelected && (
-                <div className="mt-3 pt-3 border-t border-space-border">
-                  <div className="text-sm text-cosmic-silver">
+                <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border)' }}>
+                  <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
                     {getDirectionDesc(dir.id)}
                   </div>
                 </div>

@@ -27,7 +27,7 @@ export function DISCProfile({ values, dominant, combo }: DISCProfileProps) {
         return (
           <div key={type} className="flex items-center gap-3">
             <span className="text-xs font-bold w-6" style={{ color: DISC_COLORS[type] }}>{type}</span>
-            <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ background: 'rgba(30, 37, 56, 0.8)' }}>
+            <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ background: 'var(--color-navy-dark)' }}>
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
@@ -42,7 +42,7 @@ export function DISCProfile({ values, dominant, combo }: DISCProfileProps) {
         )
       })}
 
-      <div className="mt-3 p-3 rounded-lg" style={{ background: 'rgba(30, 37, 56, 0.5)', border: `2px solid ${DISC_COLORS[dominant]}` }}>
+      <div className="mt-3 p-3 rounded-lg" style={{ background: 'var(--color-glass)', border: `2px solid ${DISC_COLORS[dominant]}` }}>
         <div className="flex items-center gap-2">
           <span className="text-lg" style={{ color: DISC_COLORS[dominant] }}>●</span>
           <span className="text-sm font-bold" style={{ color: DISC_COLORS[dominant] }}>
@@ -54,7 +54,7 @@ export function DISCProfile({ values, dominant, combo }: DISCProfileProps) {
             <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: DISC_COMBO[combo].color + '30', color: DISC_COMBO[combo].color }}>
               {DISC_COMBO[combo][`label${lang === 'en' ? 'En' : 'Ru'}`]}
             </span>
-            <p className="text-xs text-cosmic-silver mt-1">
+            <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
               {DISC_COMBO[combo][`desc${lang === 'en' ? 'En' : 'Ru'}`]}
             </p>
           </div>

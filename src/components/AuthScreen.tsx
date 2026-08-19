@@ -50,43 +50,27 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-space-deep text-star-white flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--color-navy)' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">🚀</div>
-          <h1 className="text-3xl font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
-          <p className="text-cosmic-silver mt-2">
+          <h1 className="text-3xl font-bold font-mono tracking-wider" style={{ color: 'var(--color-accent)' }}>{t('appName')}</h1>
+          <p className="mt-2" style={{ color: 'var(--color-muted)' }}>
             {lang === 'ru' ? 'Космическое путешествие начинается' : 'Your space journey begins'}
           </p>
         </div>
 
-        <div className="neon-card p-6 scanlines">
-          <div className="flex mb-6 rounded-lg overflow-hidden" style={{ background: 'rgba(30, 37, 56, 0.8)' }}>
+        <div className="gc p-6">
+          <div className="flex mb-6 rounded-lg overflow-hidden">
             <button
               onClick={() => { setMode('login'); setError(null); setSuccess(null) }}
-              className={`flex-1 py-2.5 text-sm font-bold transition-all ${
-                mode === 'login'
-                  ? 'text-space-deep'
-                  : 'text-cosmic-silver hover:text-star-white'
-              }`}
-              style={mode === 'login' ? {
-                background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-                boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
-              } : {}}
+              className={mode === 'login' ? 'pill active flex-1' : 'pill flex-1'}
             >
               {lang === 'ru' ? 'Вход' : 'Login'}
             </button>
             <button
               onClick={() => { setMode('signup'); setError(null); setSuccess(null) }}
-              className={`flex-1 py-2.5 text-sm font-bold transition-all ${
-                mode === 'signup'
-                  ? 'text-space-deep'
-                  : 'text-cosmic-silver hover:text-star-white'
-              }`}
-              style={mode === 'signup' ? {
-                background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-                boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
-              } : {}}
+              className={mode === 'signup' ? 'pill active flex-1' : 'pill flex-1'}
             >
               {lang === 'ru' ? 'Регистрация' : 'Sign Up'}
             </button>
@@ -95,7 +79,7 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs text-cosmic-silver mb-1.5 font-mono">
+                <label className="block text-xs mb-1.5 font-mono" style={{ color: 'var(--color-muted)' }}>
                   {lang === 'ru' ? 'Имя космонавта' : 'Astronaut name'}
                 </label>
                 <input
@@ -103,26 +87,13 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={lang === 'ru' ? 'Ваше имя...' : 'Your name...'}
-                  className="w-full px-4 py-3 rounded-lg text-sm font-medium transition-all outline-none"
-                  style={{
-                    background: 'rgba(30, 37, 56, 0.8)',
-                    border: '1px solid #2E3548',
-                    color: '#E8F0FE',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#00D4FF'
-                    e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.2)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#2E3548'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  className="input w-full"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-xs text-cosmic-silver mb-1.5 font-mono">
+              <label className="block text-xs mb-1.5 font-mono" style={{ color: 'var(--color-muted)' }}>
                 {lang === 'ru' ? 'Email' : 'Email'}
               </label>
               <input
@@ -131,25 +102,12 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={lang === 'ru' ? 'cosmonaut@space.com' : 'astronaut@space.com'}
                 required
-                className="w-full px-4 py-3 rounded-lg text-sm font-medium transition-all outline-none"
-                style={{
-                  background: 'rgba(30, 37, 56, 0.8)',
-                  border: '1px solid #2E3548',
-                  color: '#E8F0FE',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#00D4FF'
-                  e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.2)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '#2E3548'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
+                className="input w-full"
               />
             </div>
 
             <div>
-              <label className="block text-xs text-cosmic-silver mb-1.5 font-mono">
+              <label className="block text-xs mb-1.5 font-mono" style={{ color: 'var(--color-muted)' }}>
                 {lang === 'ru' ? 'Пароль' : 'Password'}
               </label>
               <input
@@ -159,28 +117,15 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
                 placeholder={lang === 'ru' ? 'Минимум 6 символов' : 'Minimum 6 characters'}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-lg text-sm font-medium transition-all outline-none"
-                style={{
-                  background: 'rgba(30, 37, 56, 0.8)',
-                  border: '1px solid #2E3548',
-                  color: '#E8F0FE',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = '#00D4FF'
-                  e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 212, 255, 0.2)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = '#2E3548'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
+                className="input w-full"
               />
             </div>
 
             {error && (
               <div className="px-3 py-2 rounded-lg text-sm" style={{
-                background: 'rgba(255, 82, 82, 0.1)',
-                border: '1px solid rgba(255, 82, 82, 0.3)',
-                color: '#FF5252',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: 'var(--color-status-error)',
               }}>
                 {error}
               </div>
@@ -188,9 +133,9 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
 
             {success && (
               <div className="px-3 py-2 rounded-lg text-sm" style={{
-                background: 'rgba(0, 230, 118, 0.1)',
-                border: '1px solid rgba(0, 230, 118, 0.3)',
-                color: '#00E676',
+                background: 'rgba(34, 211, 166, 0.1)',
+                border: '1px solid rgba(34, 211, 166, 0.3)',
+                color: 'var(--color-status-success)',
               }}>
                 {success}
               </div>
@@ -199,20 +144,7 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-bold text-sm transition-all duration-300 disabled:opacity-50"
-              style={{
-                background: 'linear-gradient(135deg, #00D4FF, #B24BF3)',
-                color: '#0A0E1A',
-                boxShadow: '0 0 20px rgba(0, 212, 255, 0.3)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 212, 255, 0.5)'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
+              className="w-full btn-accent disabled:opacity-50"
             >
               {loading
                 ? (lang === 'ru' ? 'Загрузка...' : 'Loading...')
@@ -224,7 +156,7 @@ export function AuthScreen({ onAuth }: AuthScreenProps) {
           </form>
         </div>
 
-        <p className="text-center text-xs text-cosmic-silver mt-6">
+        <p className="text-center text-xs mt-6" style={{ color: 'var(--color-muted)' }}>
           {lang === 'ru'
             ? 'ONE! Profile v2 — Геймификация обучения'
             : 'ONE! Profile v2 — Gamified Learning'}

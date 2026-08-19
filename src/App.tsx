@@ -7,16 +7,12 @@ import { purchaseShipItem, performPrestige, evaluateBadges } from './lib/currenc
 import { computeCompetencyScores, computeDISC, scoreProfessions, getReportLevel } from './lib/skills-report-config'
 import { supabase } from './lib/supabase'
 import type { Locale } from './lib/i18n'
-import type { Direction, Observation } from './types/database'
+import type { Observation } from './types/database'
 
 import { AuthScreen } from './components/AuthScreen'
 import { ShipVisual } from './components/ShipVisual'
 import { SkillRadar } from './components/SkillRadar'
 import { MissionSystem } from './components/MissionSystem'
-import { SquadSystem } from './components/SquadSystem'
-import { SportTracker } from './components/SportTracker'
-import { ProjectTracker } from './components/ProjectTracker'
-import { DirectionSystem } from './components/DirectionSystem'
 import { BadgeSystem } from './components/BadgeSystem'
 import { CareerTest } from './components/CareerTest'
 import { GMGradingWorkflow } from './components/GMGradingWorkflow'
@@ -24,7 +20,6 @@ import { DailyBonus } from './components/DailyBonus'
 import { PerkSystem } from './components/PerkSystem'
 import { ShipCustomization } from './components/ShipCustomization'
 import { PrestigeSystem } from './components/PrestigeSystem'
-import { SquadShip } from './components/SquadShip'
 import { LeaderboardUI } from './components/LeaderboardUI'
 import { ShipEvolutionUI } from './components/ShipEvolutionUI'
 import { TutorialSystem } from './components/TutorialSystem'
@@ -34,39 +29,32 @@ import { ShiftManager } from './components/ShiftManager'
 import { ObservationLog } from './components/ObservationLog'
 import { StudentReport } from './components/StudentReport'
 
-type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm' | 'shifts' | 'observations' | 'more'
+type Page = 'home' | 'missions' | 'badges' | 'report' | 'ship' | 'staff'
 
-const tabs: { id: Tab; icon: string; label: string }[] = [
-  { id: 'profile', icon: '👤', label: t('navProfile') },
-  { id: 'missions', icon: '📋', label: t('navMissions') },
-  { id: 'squad', icon: '👥', label: t('navSquad') },
-  { id: 'sport', icon: '🏃', label: t('navSport') },
-  { id: 'projects', icon: '📊', label: t('navProjects') },
-  { id: 'directions', icon: '🧭', label: t('navDirections') },
-  { id: 'badges', icon: '🏆', label: t('navBadges') },
-  { id: 'perks', icon: '✨', label: t('navPerks') },
-  { id: 'ship', icon: '🚀', label: t('navShip') },
-  { id: 'prestige', icon: '⭐', label: t('navPrestige') },
-  { id: 'gm', icon: '🎮', label: t('navGM') },
-  { id: 'shifts', icon: '🏕️', label: t('navShifts') },
-  { id: 'observations', icon: '📝', label: t('navObservations') },
-  { id: 'more', icon: '⋯', label: t('navMore') },
+interface NavItem {
+  id: Page
+  icon: string
+  labelRu: string
+  labelEn: string
+  adminOnly?: boolean
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'home', icon: '🏠', labelRu: 'Главная', labelEn: 'Home' },
+  { id: 'missions', icon: '📋', labelRu: 'Задания', labelEn: 'Missions' },
+  { id: 'badges', icon: '🏆', labelRu: 'Достижения', labelEn: 'Badges' },
+  { id: 'report', icon: '📊', labelRu: 'Отчёт', labelEn: 'Report' },
+  { id: 'ship', icon: '🚀', labelRu: 'Корабль', labelEn: 'Ship' },
+  { id: 'staff', icon: '🎮', labelRu: 'Персонал', labelEn: 'Staff', adminOnly: true },
 ]
-
-const PRIMARY_TABS: Tab[] = ['profile', 'missions', 'squad', 'badges', 'more']
-
-const OVERFLOW_TABS: Tab[] = ['sport', 'projects', 'directions', 'perks', 'ship', 'prestige', 'gm', 'shifts', 'observations']
 
 function App() {
   const { user, studentId, student, skills, loading, error, refetch, signOut } = useAppData()
   const { notifications, addNotification, dismissNotification } = useNotifications()
   const [lang, setLang] = useState<Locale>(getLocale())
-  const [activeTab, setActiveTab] = useState<Tab>('profile')
-  const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null)
+  const [activePage, setActivePage] = useState<Page>('home')
   const [showCareerTest, setShowCareerTest] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
-  const [showMoreDrawer, setShowMoreDrawer] = useState(false)
-  const moreDrawerRef = useRef<HTMLDivElement>(null)
   const badgesEvaluatedRef = useRef(false)
   const [showLevelUp, setShowLevelUp] = useState(false)
   const [showReport, setShowReport] = useState(false)
@@ -97,17 +85,7 @@ function App() {
     }).catch(() => {})
   }, [sid])
 
-  // Escape key closes More Drawer
-  useEffect(() => {
-    if (!showMoreDrawer) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowMoreDrawer(false)
-    }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [showMoreDrawer])
-
-  // Auto-tutorial for first-time users (total_xp === 0 means never completed a mission)
+  // Auto-tutorial for first-time users
   useEffect(() => {
     if (!student || loading) return
     const hasSeenTutorial = localStorage.getItem('one-profile-tutorial-seen')
@@ -125,13 +103,13 @@ function App() {
     prevLevelRef.current = level
   }, [level])
 
-  // Load observations for current user (for report)
+  // Load observations for report
   useEffect(() => {
     if (!sid) return
     supabase.from('observations').select('*').eq('student_id', sid).then(({ data }) => setMyObservations(data || []))
   }, [sid, refetch])
 
-  // Load all students for GM features
+  // Load all students for admin features
   useEffect(() => {
     if (!sid) return
     supabase.from('students').select('*').then(({ data }) => setAllStudents(data || []))
@@ -142,7 +120,7 @@ function App() {
     setLocale(newLang)
   }
 
-  // Auth gate: show auth screen if not logged in
+  // Auth gate
   if (!loading && !user) {
     return <AuthScreen onAuth={() => refetch()} />
   }
@@ -151,10 +129,10 @@ function App() {
 
   if (showCareerTest) {
     return (
-      <div className="h-screen bg-space-deep text-star-white p-4 flex items-center justify-center">
+      <div className="h-screen p-4 flex items-center justify-center" style={{ background: 'var(--color-navy)' }}>
         <div className="w-full max-w-md">
-          <button onClick={() => setShowCareerTest(false)} className="mb-4 text-cosmic-silver hover:text-plasma-cyan transition-colors">← Back</button>
-          <CareerTest onComplete={(direction) => { setSelectedDirection(direction); setShowCareerTest(false); setActiveTab('directions') }} />
+          <button onClick={() => setShowCareerTest(false)} className="mb-4 text-sm" style={{ color: 'var(--color-muted)' }}>← Back</button>
+          <CareerTest onComplete={(_direction) => { setShowCareerTest(false); setActivePage('report') }} />
         </div>
       </div>
     )
@@ -162,15 +140,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-space-deep text-star-white flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center" style={{ background: 'var(--color-navy)' }}>
         <div className="text-center">
-          <div className="text-5xl mb-4 animate-pulse">🚀</div>
-          <div className="text-lg neon-text-cyan">{t('skeletonLoading')} ONE! Profile...</div>
-          <div className="mt-4 flex gap-1 justify-center">
-            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
+          <div className="text-5xl mb-4">🚀</div>
+          <div className="text-lg font-bold" style={{ color: 'var(--color-accent)' }}>{t('loading')} ONE! Profile...</div>
         </div>
       </div>
     )
@@ -178,22 +151,12 @@ function App() {
 
   if (error || !student || !studentId) {
     return (
-      <div className="h-screen bg-space-deep text-star-white flex items-center justify-center p-4">
+      <div className="h-screen flex items-center justify-center p-4" style={{ background: 'var(--color-navy)' }}>
         <div className="text-center max-w-md">
           <div className="text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold mb-2">{t('error')}</h2>
-          <p className="text-cosmic-silver mb-4 font-mono text-xs break-all">{error || t('error')}</p>
-          <button
-            onClick={refetch}
-            className="px-6 py-2 rounded-lg font-bold transition-all"
-            style={{
-              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-              color: '#0A0E1A',
-              boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
-            }}
-          >
-            {t('retry')}
-          </button>
+          <p className="mb-4 font-mono text-xs break-all" style={{ color: 'var(--color-muted)' }}>{error || t('error')}</p>
+          <button onClick={refetch} className="btn-accent px-6 py-2 text-sm">{t('retry')}</button>
         </div>
       </div>
     )
@@ -201,174 +164,162 @@ function App() {
 
   const s = student!
 
-  function renderContent() {
-    switch (activeTab) {
-      case 'profile': return (
-        <div className="space-y-4 animate-fade-in">
-          {/* Profile Header: Avatar + Name + Rank */}
-          <div className="neon-card p-6 scanlines">
+  // Filter nav items by role
+  const visibleNav = NAV_ITEMS.filter(item => !item.adminOnly)
+
+  function renderPage() {
+    switch (activePage) {
+      case 'home': return (
+        <div className="space-y-4 page-enter">
+          {/* Profile Header */}
+          <div className="gc p-5">
             <div className="flex items-center gap-4 mb-4">
-              <div className="relative flex-shrink-0">
-                <ShipVisual level={level} className="flex-shrink-0" />
-              </div>
+              <ShipVisual level={level} className="flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <h2 className="text-xl font-bold truncate">{s.nickname}</h2>
-                <p className="text-xs font-mono mt-0.5" style={{ color: '#A0AAB8' }}>
-                  {shipStage}
-                </p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--color-muted)' }}>{shipStage}</p>
               </div>
-              <div className="neon-card px-3 py-1.5 text-center flex-shrink-0">
-                <div className="text-xs font-mono" style={{ color: '#A0AAB8' }}>{t('level')}</div>
-                <div className="text-lg font-mono font-bold neon-text-cyan">{level}</div>
+              <div className="text-center flex-shrink-0">
+                <div className="font-display text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>{level}</div>
+                <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--color-muted)' }}>{t('level')}</div>
               </div>
             </div>
 
-            {/* XP Bar — emotional: "До уровня X осталось Y XP" */}
+            {/* XP Bar */}
             <div className="mb-4">
-              <div className="flex justify-between text-xs mb-1.5">
-                <span className="font-mono neon-text-cyan">{xpInCurrent} XP</span>
-                <span className="font-mono" style={{ color: '#A0AAB8' }}>{xpNeeded} XP {t('xpToNextLevelShort').replace('{level}', String(level + 1))}</span>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{xpInCurrent} XP</span>
+                <span className="font-mono" style={{ color: 'var(--color-muted)' }}>{xpNeeded} XP → {t('level')} {level + 1}</span>
               </div>
-              <div className={`relative h-3 bg-space-deep rounded-full overflow-hidden ${xpProgress >= 80 ? 'xp-bar-near-level' : ''}`}
-                style={{ border: '1px solid rgba(46, 53, 72, 0.5)' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-700 ease-out xp-bar-scan"
-                  style={{
-                    width: `${Math.max(xpProgress, 2)}%`,
-                    background: xpProgress >= 80
-                      ? 'linear-gradient(90deg, #00D4FF, #B24BF3, #00E676)'
-                      : xpProgress >= 50
-                        ? 'linear-gradient(90deg, #00D4FF, #B24BF3)'
-                        : 'linear-gradient(90deg, #4A90D9, #00D4FF)',
-                    boxShadow: xpProgress >= 80
-                      ? '0 0 12px rgba(0, 212, 255, 0.6), 0 0 20px rgba(178, 75, 243, 0.3)'
-                      : '0 0 8px rgba(0, 212, 255, 0.4)',
-                  }}
-                />
+              <div className="progress-bar">
+                <div className="progress-bar-fill" style={{ width: `${Math.max(xpProgress, 2)}%` }} />
               </div>
             </div>
 
-            {/* Currency Cards — labeled, color-coded */}
-            <div className="grid grid-cols-3 gap-2.5">
-              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 215, 64, 0.2)' }}>
-                <div className="text-base mb-0.5">💰</div>
-                <div className="font-mono text-sm font-bold" style={{ color: '#FFD740' }}>{coins}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('coinsLabel')}</div>
+            {/* Stat Row */}
+            <div className="grid grid-cols-4 gap-3">
+              <div className="stat-block">
+                <div className="stat-value">{coins}</div>
+                <div className="stat-label">💰 {t('coinsLabel')}</div>
               </div>
-              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(0, 212, 255, 0.2)' }}>
-                <div className="text-base mb-0.5">💎</div>
-                <div className="font-mono text-sm font-bold" style={{ color: '#00D4FF' }}>{gems}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('gemsLabel')}</div>
+              <div className="stat-block">
+                <div className="stat-value">{gems}</div>
+                <div className="stat-label">💎 {t('gemsLabel')}</div>
               </div>
-              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 145, 0, 0.2)' }}>
-                <div className="text-base mb-0.5">🔥</div>
-                <div className="font-mono text-sm font-bold" style={{ color: '#FF9100' }}>{streak}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#A0AAB8' }}>{t('streakLabel')}</div>
+              <div className="stat-block">
+                <div className="stat-value">{streak}</div>
+                <div className="stat-label">🔥 {t('streakLabel')}</div>
+              </div>
+              <div className="stat-block">
+                <div className="stat-value">{myObservations.length}</div>
+                <div className="stat-label">📝 {lang === 'ru' ? 'Наблюдения' : 'Observations'}</div>
               </div>
             </div>
           </div>
 
+          {/* Daily Bonus */}
           <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
 
-          {/* Skill Radar — shrunk, with empty state */}
-          <div className="neon-card p-4 scanlines flex justify-center">
+          {/* Quick Actions Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <button onClick={() => setActivePage('missions')} className="gc p-4 text-left">
+              <div className="text-2xl mb-2">📋</div>
+              <div className="text-sm font-bold">{t('navMissions')}</div>
+            </button>
+            <button onClick={() => setActivePage('badges')} className="gc p-4 text-left">
+              <div className="text-2xl mb-2">🏆</div>
+              <div className="text-sm font-bold">{t('navBadges')}</div>
+            </button>
+            <button onClick={() => setShowReport(true)} className="gc p-4 text-left">
+              <div className="text-2xl mb-2">📊</div>
+              <div className="text-sm font-bold">{t('reportTitle')}</div>
+            </button>
+            <button onClick={() => setActivePage('ship')} className="gc p-4 text-left">
+              <div className="text-2xl mb-2">🚀</div>
+              <div className="text-sm font-bold">{t('navShip')}</div>
+            </button>
+          </div>
+
+          {/* Skill Radar */}
+          <div className="gc p-4 flex justify-center">
             <SkillRadar skills={skills} size={180} />
           </div>
 
-          {/* Next Goal CTA */}
-          <button onClick={() => setActiveTab('missions')} className="w-full neon-card p-4 text-left transition-all hover:border-plasma-cyan/40">
+          {/* Mystery Box */}
+          <MysteryBox studentId={sid} coins={coins} gems={gems} onOpened={refetch} />
+        </div>
+      )
+
+      case 'missions': return (
+        <div className="page-enter">
+          <MissionSystem studentId={sid} onMissionComplete={refetch} />
+        </div>
+      )
+
+      case 'badges': return (
+        <div className="space-y-4 page-enter">
+          <BadgeSystem studentId={sid} />
+          <LeaderboardUI currentStudentId={sid} />
+          <button onClick={() => setShowCareerTest(true)} className="gc p-4 w-full text-left">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{
-                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(178, 75, 243, 0.15))',
-              }}>
-                <span className="text-xl">🎯</span>
+              <span className="text-2xl">🧭</span>
+              <div>
+                <div className="text-sm font-bold">{t('careerTitle')}</div>
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('careerBasedOn')}</div>
+              </div>
+            </div>
+          </button>
+        </div>
+      )
+
+      case 'report': return (
+        <div className="page-enter">
+          <button onClick={() => setShowReport(true)} className="gc p-5 w-full text-left">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl" style={{ background: 'var(--color-accent-dim)' }}>
+                📄
               </div>
               <div>
-                <h3 className="text-sm font-bold" style={{ color: '#E8F0FE' }}>{t('nextGoal')}</h3>
-                <p className="text-xs" style={{ color: '#A0AAB8' }}>
-                  {t('nextGoalDesc').replace('{xp}', String(xpNeeded)).replace('{level}', String(level + 1))}
+                <h3 className="font-bold text-lg">{t('reportTitle')}</h3>
+                <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
+                  {t('radarTitle')} · {t('discTitle')} · {t('careerPanelTitle')} · AI
                 </p>
               </div>
             </div>
           </button>
-
-          {/* Career Test */}
-          <button onClick={() => setShowCareerTest(true)} className="w-full neon-card p-4 text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl" style={{
-                background: 'linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 212, 255, 0.15))',
-              }}>
-                🧭
-              </div>
-              <div>
-                <h3 className="font-bold">{t('careerTitle')}</h3>
-                <p className="text-sm" style={{ color: '#A0AAB8' }}>{t('careerBasedOn')}</p>
-              </div>
-            </div>
-          </button>
-
-          {/* Mystery Box — coin sink */}
-          <MysteryBox studentId={sid} coins={coins} gems={gems} onOpened={refetch} />
-
-          {/* Full Report button */}
-          <button onClick={() => setShowReport(true)} className="w-full neon-card p-4 text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl" style={{
-                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(178, 75, 243, 0.15))',
-              }}>
-                📄
-              </div>
-              <div>
-                <h3 className="font-bold">{t('reportTitle')}</h3>
-                <p className="text-xs" style={{ color: '#A0AAB8' }}>{t('radarTitle')} · {t('discTitle')} · {t('careerPanelTitle')}</p>
-              </div>
-            </div>
-          </button>
+          <div className="mt-4">
+            <SkillRadar skills={skills} size={220} />
+          </div>
         </div>
       )
-      case 'missions': return <MissionSystem studentId={sid} onMissionComplete={refetch} />
-      case 'squad': return <SquadSystem studentId={sid} />
-      case 'sport': return <SportTracker studentId={sid} onStatAdded={refetch} />
-      case 'projects': return <ProjectTracker studentId={sid} onProjectComplete={refetch} />
-      case 'directions': return <DirectionSystem skills={skills} selectedDirection={selectedDirection} onSelectDirection={setSelectedDirection} />
-      case 'badges': return <BadgeSystem studentId={sid} />
-      case 'perks': return           <PerkSystem currentPerks={currentPerks} onPerksChange={async (perks) => { await setStudentPerks(sid, perks); refetch() }} />
+
       case 'ship': return (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-4 page-enter">
           <ShipEvolutionUI level={level} />
           <ShipCustomization level={level} coins={coins} gems={gems} onPurchase={async (itemId, cost, currency) => { await purchaseShipItem(sid, itemId, cost, currency); refetch() }} />
+          <PerkSystem currentPerks={currentPerks} onPerksChange={async (perks) => { await setStudentPerks(sid, perks); refetch() }} />
+          {level >= 25 && <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={async () => { await performPrestige(sid); refetch() }} />}
         </div>
       )
-      case 'prestige': return <PrestigeSystem totalXp={totalXp} prestigeCount={prestigeCount} onPrestige={async () => { await performPrestige(sid); refetch() }} />
-      case 'gm': return (
-        <div className="space-y-4 animate-fade-in">
+
+      case 'staff': return (
+        <div className="space-y-4 page-enter">
           <GMGradingWorkflow gmId={sid} />
-          <LeaderboardUI currentStudentId={sid} />
-          <SquadShip squadLevel={1} memberCount={0} />
+          <ShiftManager students={allStudents} />
+          <ObservationLog students={allStudents} counselorId={sid} />
         </div>
       )
-      case 'shifts': return <ShiftManager students={allStudents} />
-      case 'observations': return <ObservationLog students={allStudents} counselorId={sid} />
     }
   }
 
-  const currentTab = tabs.find(tab => tab.id === activeTab)
-
-  // Level-based feature gating
-  const visibleOverflowTabs = OVERFLOW_TABS.filter(tabId => {
-    if (tabId === 'prestige' && level < 25) return false
-    if (tabId === 'ship' && level < 3) return false
-    if (tabId === 'sport' && level < 2) return false
-    if (tabId === 'perks' && level < 5) return false
-    return true
-  })
-
   return (
-    <div className="h-screen bg-space-deep text-star-white flex overflow-hidden">
-      <a href="#main-content" className="skip-to-content">{t('loading') === 'Загрузка...' ? 'Перейти к содержимому' : 'Skip to content'}</a>
+    <div className="h-screen flex overflow-hidden" style={{ background: 'var(--color-navy)', color: 'var(--color-white)' }}>
+      <a href="#main-content" className="skip-to-content">
+        {lang === 'ru' ? 'Перейти к содержимому' : 'Skip to content'}
+      </a>
       <NotificationSystem notifications={notifications} onDismiss={dismissNotification} />
 
-      {/* Report overlay */}
+      {/* Report Overlay */}
       {showReport && student && (
         <StudentReport
           student={student}
@@ -381,128 +332,89 @@ function App() {
         />
       )}
 
-      {/* Level-Up Celebration Overlay */}
+      {/* Level-Up Celebration */}
       {showLevelUp && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none level-up-overlay">
           <div className="text-center">
             <div className="text-7xl mb-4">🎉</div>
-            <div className="text-3xl font-bold neon-text-cyan mb-2">
+            <div className="text-3xl font-bold font-display" style={{ color: 'var(--color-accent)' }}>
               {t('level')} {level}!
-            </div>
-            <div className="text-lg" style={{ color: '#B24BF3' }}>
-              {lang === 'ru' ? 'Уровень повышен!' : 'Level Up!'}
             </div>
           </div>
         </div>
       )}
+
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-56 lg:w-64 border-r border-space-border flex-shrink-0" style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}>
+      <aside className="hidden md:flex flex-col w-56 border-r flex-shrink-0" style={{ background: 'var(--color-navy-dark)', borderColor: 'var(--color-border)' }}>
         {/* Logo */}
-        <div className="px-4 py-5 border-b border-space-border">
-          <h1 className="text-xl font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
-          <div className="flex gap-3 mt-3" aria-live="polite">
-            <div className="flex items-center gap-1.5 text-xs">
-              <span aria-hidden="true">💰</span><span className="font-mono neon-text-warning">{coins}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs">
-              <span aria-hidden="true">💎</span><span className="font-mono neon-text-premium">{gems}</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs">
-              <span aria-hidden="true">🔥</span><span className="font-mono neon-text-green">{streak}</span>
-            </div>
-          </div>
+        <div className="px-4 py-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
+          <h1 className="text-lg font-bold font-display tracking-wider" style={{ color: 'var(--color-accent)' }}>
+            {t('appName')}
+          </h1>
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-cosmic-silver font-mono">{t('level')} {level}</span>
-              <span className="text-cosmic-silver font-mono">{shipStage}</span>
+              <span style={{ color: 'var(--color-muted)' }}>{t('level')} {level}</span>
+              <span style={{ color: 'var(--color-muted)' }}>{shipStage}</span>
             </div>
-            <div className="h-1.5 bg-space-deep rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${xpProgress}%`,
-                  background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
-                  boxShadow: '0 0 6px rgba(0, 212, 255, 0.4)',
-                }}
-              />
+            <div className="progress-bar">
+              <div className="progress-bar-fill" style={{ width: `${xpProgress}%` }} />
             </div>
           </div>
         </div>
 
-        {/* Nav Items */}
+        {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-2">
-          {tabs.filter(tab => tab.id !== 'more').map((tab) => {
-            const isActive = activeTab === tab.id
+          {visibleNav.map((item) => {
+            const isActive = activePage === item.id
             return (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                aria-label={tab.label}
-                aria-current={isActive ? 'page' : undefined}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all duration-200 relative ${
-                  isActive
-                    ? 'nav-active-glow bg-plasma-cyan/8 text-plasma-cyan'
-                    : 'text-cosmic-silver hover:bg-space-gray/50 hover:text-star-white'
+                key={item.id}
+                onClick={() => setActivePage(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all relative ${
+                  isActive ? 'nav-active' : 'hover:bg-white/5'
                 }`}
+                style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-muted)' }}
               >
-                <span className="text-lg w-6 text-center">{tab.icon}</span>
-                <span className="text-sm font-medium">{tab.label}</span>
-                {isActive && (
-                  <div
-                    className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l"
-                    style={{
-                      background: '#00D4FF',
-                      boxShadow: '0 0 10px rgba(0, 212, 255, 0.6)',
-                    }}
-                  />
-                )}
+                <span className="text-lg w-6 text-center">{item.icon}</span>
+                <span className="text-sm font-medium">{lang === 'ru' ? item.labelRu : item.labelEn}</span>
               </button>
             )
           })}
         </nav>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-space-border flex gap-2">
+        <div className="px-4 py-3 border-t flex gap-2" style={{ borderColor: 'var(--color-border)' }}>
           <button
             onClick={() => setShowTutorial(true)}
-            className="flex-1 py-1.5 rounded text-xs text-cosmic-silver hover:text-plasma-cyan transition-colors"
-            style={{ background: 'rgba(30, 37, 56, 0.5)' }}
+            className="flex-1 py-1.5 rounded text-xs transition-colors"
+            style={{ background: 'var(--color-glass)', color: 'var(--color-muted)' }}
           >
             {t('tutorial')}
           </button>
           <button
             onClick={() => signOut()}
-            className="flex-1 py-1.5 rounded text-xs text-cosmic-silver hover:text-status-error transition-colors"
-            style={{ background: 'rgba(30, 37, 56, 0.5)' }}
-            aria-label={lang === 'ru' ? 'Выйти' : 'Sign Out'}
+            className="flex-1 py-1.5 rounded text-xs transition-colors"
+            style={{ background: 'var(--color-glass)', color: 'var(--color-muted)' }}
           >
             {lang === 'ru' ? 'Выйти' : 'Sign Out'}
           </button>
           <button
             onClick={() => handleLangChange('ru')}
-            className={`px-2 py-1.5 rounded text-xs font-bold transition-all ${
-              lang === 'ru'
-                ? 'text-space-deep'
-                : 'text-cosmic-silver hover:text-star-white'
-            }`}
-            style={lang === 'ru' ? {
-              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-              boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
-            } : { background: 'rgba(30, 37, 56, 0.5)' }}
+            className="px-2 py-1.5 rounded text-xs font-bold transition-all"
+            style={{
+              background: lang === 'ru' ? 'var(--color-accent)' : 'var(--color-glass)',
+              color: lang === 'ru' ? 'var(--color-navy-dark)' : 'var(--color-muted)',
+            }}
           >
             RU
           </button>
           <button
             onClick={() => handleLangChange('en')}
-            className={`px-2 py-1.5 rounded text-xs font-bold transition-all ${
-              lang === 'en'
-                ? 'text-space-deep'
-                : 'text-cosmic-silver hover:text-star-white'
-            }`}
-            style={lang === 'en' ? {
-              background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-              boxShadow: '0 0 10px rgba(0, 212, 255, 0.3)',
-            } : { background: 'rgba(30, 37, 56, 0.5)' }}
+            className="px-2 py-1.5 rounded text-xs font-bold transition-all"
+            style={{
+              background: lang === 'en' ? 'var(--color-accent)' : 'var(--color-glass)',
+              color: lang === 'en' ? 'var(--color-navy-dark)' : 'var(--color-muted)',
+            }}
           >
             EN
           </button>
@@ -510,40 +422,41 @@ function App() {
       </aside>
 
       {/* Mobile Header */}
-      <div
-        className="md:hidden fixed top-0 left-0 right-0 z-40 border-b border-space-border"
-        style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}
-      >
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 border-b" style={{ background: 'var(--color-navy-dark)', borderColor: 'var(--color-border)' }}>
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold font-mono neon-text-cyan tracking-wider">{t('appName')}</h1>
+          <h1 className="text-base font-bold font-display tracking-wider" style={{ color: 'var(--color-accent)' }}>
+            {t('appName')}
+          </h1>
           <div className="flex items-center gap-3">
             <div className="flex gap-2 text-xs" aria-live="polite">
-              <span><span aria-hidden="true">💰</span><span className="font-mono neon-text-warning ml-0.5">{coins}</span></span>
-              <span><span aria-hidden="true">💎</span><span className="font-mono neon-text-premium ml-0.5">{gems}</span></span>
-              <span><span aria-hidden="true">🔥</span><span className="font-mono neon-text-green ml-0.5">{streak}</span></span>
+              <span>💰 <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{coins}</span></span>
+              <span>💎 <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{gems}</span></span>
             </div>
             <div className="flex gap-1">
               <button
                 onClick={() => handleLangChange('ru')}
-                className={`px-1.5 py-0.5 rounded text-xs font-bold transition-all ${lang === 'ru' ? 'text-space-deep' : 'text-cosmic-silver'}`}
-                style={lang === 'ru' ? {
-                  background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-                } : {}}
+                className="px-1.5 py-0.5 rounded text-xs font-bold"
+                style={{
+                  background: lang === 'ru' ? 'var(--color-accent)' : 'transparent',
+                  color: lang === 'ru' ? 'var(--color-navy-dark)' : 'var(--color-muted)',
+                }}
               >
                 RU
               </button>
               <button
                 onClick={() => handleLangChange('en')}
-                className={`px-1.5 py-0.5 rounded text-xs font-bold transition-all ${lang === 'en' ? 'text-space-deep' : 'text-cosmic-silver'}`}
-                style={lang === 'en' ? {
-                  background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-                } : {}}
+                className="px-1.5 py-0.5 rounded text-xs font-bold"
+                style={{
+                  background: lang === 'en' ? 'var(--color-accent)' : 'transparent',
+                  color: lang === 'en' ? 'var(--color-navy-dark)' : 'var(--color-muted)',
+                }}
               >
                 EN
               </button>
               <button
                 onClick={() => signOut()}
-                className="px-2 py-1.5 rounded text-xs font-bold text-cosmic-silver hover:text-status-error transition-colors"
+                className="px-2 py-1.5 rounded text-xs"
+                style={{ color: 'var(--color-muted)' }}
                 aria-label={lang === 'ru' ? 'Выйти' : 'Sign Out'}
               >
                 ⏻
@@ -551,115 +464,37 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between px-4 pb-2">
-          <span className="text-sm font-medium">{currentTab?.icon} {currentTab?.label}</span>
-          <div className="text-xs text-cosmic-silver font-mono">{t('level')} {level}</div>
-        </div>
       </div>
 
       {/* Main Content */}
-      <main id="main-content" className="flex-1 overflow-y-auto md:pt-0 pt-[88px] pb-20 md:pb-0" tabIndex={-1}>
-        <div className="p-4 lg:p-6 max-w-5xl">
-          {renderContent()}
+      <main id="main-content" className="flex-1 overflow-y-auto md:pt-0 pt-[52px] pb-20 md:pb-0" tabIndex={-1}>
+        <div className="p-4 lg:p-6 max-w-3xl mx-auto">
+          {renderPage()}
         </div>
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-space-border"
-        style={{ background: 'linear-gradient(180deg, #0E1322 0%, #12182B 100%)' }}
-      >
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t" style={{ background: 'var(--color-navy-dark)', borderColor: 'var(--color-border)' }}>
         <div className="flex">
-          {PRIMARY_TABS.map((tabId) => {
-            const tab = tabs.find(t => t.id === tabId)!
-            const isActive = tabId === 'more' ? showMoreDrawer : activeTab === tabId
+          {visibleNav.map((item) => {
+            const isActive = activePage === item.id
             return (
               <button
-                key={tabId}
-                onClick={() => {
-                  if (tabId === 'more') {
-                    setShowMoreDrawer(!showMoreDrawer)
-                  } else {
-                    setShowMoreDrawer(false)
-                    setActiveTab(tabId)
-                  }
-                }}
-                aria-label={tab.label}
-                aria-current={isActive ? 'page' : undefined}
-                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-3 flex-1 min-w-0 transition-all relative ${
-                  isActive
-                    ? 'text-plasma-cyan'
-                    : 'text-cosmic-silver'
-                }`}
+                key={item.id}
+                onClick={() => setActivePage(item.id)}
+                className="flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2.5 flex-1 min-w-0 transition-all relative"
+                style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-muted)' }}
               >
-                <span className="text-xl">{tab.icon}</span>
-                <span className="text-[10px] leading-tight truncate">{tab.label}</span>
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-[10px] leading-tight truncate">{lang === 'ru' ? item.labelRu : item.labelEn}</span>
                 {isActive && (
-                  <div
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
-                    style={{
-                      background: '#00D4FF',
-                      boxShadow: '0 0 8px rgba(0, 212, 255, 0.6)',
-                    }}
-                  />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full" style={{ background: 'var(--color-accent)' }} />
                 )}
               </button>
             )
           })}
         </div>
       </nav>
-
-      {/* More Drawer Overlay */}
-      {showMoreDrawer && (
-        <div
-          className="md:hidden fixed inset-0 z-50"
-          onClick={() => setShowMoreDrawer(false)}
-        >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <div
-            ref={moreDrawerRef}
-            className="absolute bottom-0 left-0 right-0 rounded-t-2xl border-t border-space-border animate-fade-in"
-            style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-4 py-3 border-b border-space-border flex items-center justify-between">
-              <h3 className="text-sm font-bold neon-text-cyan">{t('navMoreDrawerTitle')}</h3>
-              <button
-                onClick={() => setShowMoreDrawer(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-cosmic-silver hover:text-star-white transition-colors"
-                style={{ background: 'rgba(30, 37, 56, 0.8)' }}
-                aria-label={lang === 'ru' ? 'Закрыть' : 'Close'}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="p-2 pb-8 grid grid-cols-4 gap-2">
-              {visibleOverflowTabs.map((tabId) => {
-                const tab = tabs.find(t => t.id === tabId)!
-                const isActive = activeTab === tabId
-                return (
-                  <button
-                    key={tabId}
-                    onClick={() => {
-                      setActiveTab(tabId)
-                      setShowMoreDrawer(false)
-                    }}
-                    aria-label={tab.label}
-                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
-                      isActive
-                        ? 'bg-plasma-cyan/10 text-plasma-cyan'
-                        : 'text-cosmic-silver hover:bg-space-gray/50 hover:text-star-white'
-                    }`}
-                  >
-                    <span className="text-2xl">{tab.icon}</span>
-                    <span className="text-[10px] leading-tight text-center">{tab.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

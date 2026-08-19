@@ -46,40 +46,40 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
 
   if (result) {
     return (
-      <div className="neon-card neon-glow-green p-6 text-center scanlines">
+      <div className="gc-lg p-6 text-center">
         <div className="text-5xl mb-4 animate-bounce">🎁</div>
-        <h3 className="text-xl font-bold mb-3 neon-text-green">
+        <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--color-status-success)' }}>
           {t('dailyBonusClaimed')}
         </h3>
         {result.comebackBonus && (
           <div className="mb-3 px-3 py-2 rounded-lg text-sm font-bold" style={{
-            background: 'linear-gradient(135deg, rgba(178, 75, 243, 0.15), rgba(255, 45, 120, 0.15))',
-            border: '1px solid rgba(178, 75, 243, 0.3)',
-            color: '#B24BF3',
+            background: 'var(--color-accent-dim)',
+            border: '1px solid var(--color-border-h)',
+            color: 'var(--color-accent)',
           }}>
             🎉 {t('dailyBonusComeback')}
           </div>
         )}
         {result.streakFreezeUsed && (
           <div className="mb-3 px-3 py-2 rounded-lg text-sm font-bold" style={{
-            background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 230, 118, 0.15))',
-            border: '1px solid rgba(0, 212, 255, 0.3)',
-            color: '#00D4FF',
+            background: 'var(--color-accent-dim)',
+            border: '1px solid var(--color-border)',
+            color: 'var(--color-status-success)',
           }}>
             🧊 {t('dailyBonusStreakFreezeUsed')}
           </div>
         )}
         <div className="flex justify-center gap-8 mb-4">
           <div>
-            <div className="text-3xl font-mono font-bold neon-text-green">+{result.xp}</div>
-            <div className="text-xs text-cosmic-silver mt-1">{t('xp')}</div>
+            <div className="text-3xl font-mono font-bold" style={{ color: 'var(--color-status-success)' }}>+{result.xp}</div>
+            <div className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>{t('xp')}</div>
           </div>
           <div>
-            <div className="text-3xl font-mono font-bold neon-text-warning">+{result.coins}</div>
-            <div className="text-xs text-cosmic-silver mt-1">{t('coins')}</div>
+            <div className="text-3xl font-mono font-bold" style={{ color: 'var(--color-status-warn)' }}>+{result.coins}</div>
+            <div className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>{t('coins')}</div>
           </div>
         </div>
-        <div className="text-sm text-cosmic-silver font-mono">
+        <div className="text-sm font-mono" style={{ color: 'var(--color-muted)' }}>
           {t('dailyBonusStreak')}: {result.streak} 🔥
         </div>
       </div>
@@ -89,20 +89,20 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
   const effectiveStreak = currentStreak % 7
 
   return (
-    <div className={`neon-card p-6 scanlines ${alreadyClaimed ? '' : 'neon-glow-orange'}`}>
+    <div className={`gc-lg p-6 ${alreadyClaimed ? '' : 'border-accent'}`} style={!alreadyClaimed ? { borderColor: 'var(--color-border-h)' } : undefined}>
       <div className="text-center">
         <div className="text-5xl mb-4">🎁</div>
         <h3 className="text-xl font-bold mb-3">{t('dailyBonusTitle')}</h3>
         
         <div className="flex justify-center gap-6 mb-5">
-          <div className="neon-card px-4 py-3 text-center">
-            <div className="text-xs text-cosmic-silver mb-1">{t('dailyBonusStreak')}</div>
-            <div className="text-2xl font-mono font-bold neon-text-premium">{currentStreak} 🔥</div>
+          <div className="gc px-4 py-3 text-center">
+            <div className="text-xs mb-1" style={{ color: 'var(--color-muted)' }}>{t('dailyBonusStreak')}</div>
+            <div className="text-2xl font-mono font-bold" style={{ color: 'var(--color-accent)' }}>{currentStreak} 🔥</div>
           </div>
-          <div className="neon-card px-4 py-3 text-center">
-            <div className="text-xs text-cosmic-silver mb-1">{t('dailyBonusNext')}</div>
-            <div className="text-lg font-mono font-bold neon-text-cyan">+{getNextXp()} XP</div>
-            <div className="text-xs font-mono neon-text-warning">+{getNextCoins()} 💰</div>
+          <div className="gc px-4 py-3 text-center">
+            <div className="text-xs mb-1" style={{ color: 'var(--color-muted)' }}>{t('dailyBonusNext')}</div>
+            <div className="text-lg font-mono font-bold" style={{ color: 'var(--color-accent)' }}>+{getNextXp()} XP</div>
+            <div className="text-xs font-mono" style={{ color: 'var(--color-status-warn)' }}>+{getNextCoins()} 💰</div>
           </div>
         </div>
 
@@ -110,12 +110,11 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
         <div className="mb-5">
           <div className="relative flex justify-center items-center" style={{ minHeight: 48 }}>
             {/* Connector line behind circles */}
-            <div className="absolute left-0 right-0 flex items-center justify-center px-6" style={{ height: 2, background: 'rgba(30, 37, 56, 0.8)' }}>
+            <div className="absolute left-0 right-0 flex items-center justify-center px-6" style={{ height: 2, background: 'var(--color-glass-b)' }}>
               <div className="h-full rounded-full transition-all duration-500" style={{
                 width: `${Math.min(effectiveStreak / 7 * 100, 100)}%`,
                 maxWidth: 'calc(100% - 48px)',
-                background: 'linear-gradient(90deg, #FF9100, #FFD740)',
-                boxShadow: effectiveStreak > 0 ? '0 0 8px rgba(255, 145, 0, 0.4)' : 'none',
+                background: 'var(--color-accent)',
               }} />
             </div>
 
@@ -131,13 +130,12 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
                     className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${isCurrent ? 'day-current-pulse' : ''}`}
                     style={{
                       background: isCompleted
-                        ? 'linear-gradient(135deg, #FF9100, #FFD740)'
+                        ? 'var(--color-accent)'
                         : isCurrent
-                          ? 'linear-gradient(135deg, rgba(255, 145, 0, 0.3), rgba(255, 215, 64, 0.3))'
-                          : 'rgba(30, 37, 56, 0.8)',
-                      color: isCompleted ? '#0A0E1A' : isCurrent ? '#FFD740' : '#8B95A8',
-                      border: `2px solid ${isCompleted ? '#FF9100' : isCurrent ? 'rgba(255, 145, 0, 0.5)' : isDay7 ? 'rgba(178, 75, 243, 0.4)' : '#2E354880'}`,
-                      boxShadow: isCompleted ? '0 0 10px rgba(255, 145, 0, 0.3)' : 'none',
+                          ? 'var(--color-accent-dim)'
+                          : 'var(--color-glass-b)',
+                      color: isCompleted ? 'var(--color-navy-dark)' : isCurrent ? 'var(--color-accent)' : 'var(--color-muted)',
+                      border: `2px solid ${isCompleted ? 'var(--color-accent)' : isCurrent ? 'var(--color-border-h)' : isDay7 ? 'rgba(178, 75, 243, 0.4)' : 'var(--color-border)'}`,
                       transform: isDay7 && !isCompleted ? 'scale(1.1)' : undefined,
                     }}
                   >
@@ -147,13 +145,13 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
               })}
             </div>
           </div>
-          <div className="text-xs text-cosmic-silver mt-2 font-mono">
+          <div className="text-xs mt-2 font-mono" style={{ color: 'var(--color-muted)' }}>
             {t('dailyBonusDay7Special')}
           </div>
         </div>
 
         {error && (
-          <div className="text-sm text-status-error mb-4">{error}</div>
+          <div className="text-sm mb-4" style={{ color: 'var(--color-status-error)' }}>{error}</div>
         )}
 
         <button
@@ -161,26 +159,13 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
           disabled={loading || alreadyClaimed}
           className={`w-full py-3 rounded-lg font-bold transition-all duration-300 ${
             alreadyClaimed
-              ? 'bg-space-gray text-cosmic-silver cursor-not-allowed'
-              : ''
+              ? 'cursor-not-allowed'
+              : 'btn-accent'
           }`}
-          style={!alreadyClaimed ? {
-            background: 'linear-gradient(135deg, #FF9100, #FFD740)',
-            color: '#0A0E1A',
-            boxShadow: '0 0 20px rgba(255, 145, 0, 0.3)',
+          style={alreadyClaimed ? {
+            background: 'var(--color-glass-b)',
+            color: 'var(--color-muted)',
           } : undefined}
-          onMouseEnter={(e) => {
-            if (!alreadyClaimed) {
-              e.currentTarget.style.boxShadow = '0 0 30px rgba(255, 145, 0, 0.5)'
-              e.currentTarget.style.transform = 'translateY(-1px)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!alreadyClaimed) {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(255, 145, 0, 0.3)'
-              e.currentTarget.style.transform = 'translateY(0)'
-            }
-          }}
         >
           {loading ? t('dailyBonusClaiming') : alreadyClaimed ? t('dailyBonusAlreadyClaimed') : t('dailyBonusClaim')}
         </button>

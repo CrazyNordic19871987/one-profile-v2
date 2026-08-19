@@ -55,27 +55,27 @@ export function MissionSystem({ studentId, onMissionComplete }: MissionSystemPro
   function getStatusStyle(status: string | null) {
     switch (status) {
       case 'credited':
-        return { bg: 'rgba(0, 230, 118, 0.1)', border: '#00E676', glow: 'neon-glow-green', text: 'neon-text-green', icon: '✓', label: t('missionCompleted') }
+        return { bg: 'rgba(0, 230, 118, 0.1)', border: '#00E676', text: 'var(--color-status-success)', icon: '✓', label: t('missionCompleted') }
       case 'graded':
-        return { bg: 'rgba(255, 215, 64, 0.1)', border: '#FFD740', glow: 'neon-glow-orange', text: 'neon-text-warning', icon: '⏳', label: `${t('missionGraded')}` }
+        return { bg: 'rgba(255, 215, 64, 0.1)', border: '#FFD740', text: 'var(--color-status-warn)', icon: '⏳', label: `${t('missionGraded')}` }
       case 'pending':
-        return { bg: 'rgba(0, 212, 255, 0.1)', border: '#00D4FF', glow: 'neon-glow-cyan', text: 'neon-text-cyan', icon: '↻', label: t('missionAwaitingGrade') }
+        return { bg: 'var(--color-accent-dim)', border: 'var(--color-accent)', text: 'var(--color-accent)', icon: '↻', label: t('missionAwaitingGrade') }
       default:
-        return { bg: 'transparent', border: '#2E3548', glow: '', text: '', icon: '', label: '' }
+        return { bg: 'transparent', border: 'var(--color-border)', text: '', icon: '', label: '' }
     }
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h2 className="text-2xl font-bold neon-text-cyan">{t('missionsTitle')}</h2>
+    <div className="space-y-6 page-enter">
+      <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>{t('missionsTitle')}</h2>
 
       <div className="space-y-4">
         {missions.map((mission) => {
@@ -87,37 +87,36 @@ export function MissionSystem({ studentId, onMissionComplete }: MissionSystemPro
           return (
             <div
               key={mission.id}
-              className={`neon-card p-5 scanlines ${isCompleted ? 'neon-glow-cyan' : ''}`}
+              className={`gc p-5 ${isCompleted ? 'border-accent' : ''}`}
+              style={isCompleted ? { borderColor: 'var(--color-border-h)' } : undefined}
             >
               <div className="flex items-start gap-4">
                 <div
                   className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(178, 75, 243, 0.1))',
-                  }}
+                  style={{ background: 'var(--color-accent-dim)' }}
                 >
                   {getDirectionIcon(mission.direction)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-cosmic-silver font-mono">
+                    <span className="text-xs font-mono" style={{ color: 'var(--color-muted)' }}>
                       {getDirectionName(mission.direction)}
                     </span>
                     <div className="flex gap-0.5">
                       {Array.from({ length: mission.difficulty }).map((_, i) => (
-                        <span key={i} className="text-xs neon-text-warning">★</span>
+                        <span key={i} className="text-xs" style={{ color: 'var(--color-status-warn)' }}>★</span>
                       ))}
                     </div>
                   </div>
                   <h3 className="font-bold text-base mb-1">{mission.title}</h3>
-                  <p className="text-sm text-cosmic-silver leading-relaxed">{mission.description}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--color-muted)' }}>{mission.description}</p>
                 </div>
 
                 {status && (
                   <div
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold ${statusStyle.text}`}
-                    style={{ background: statusStyle.bg, border: `1px solid ${statusStyle.border}40` }}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold"
+                    style={{ background: statusStyle.bg, border: `1px solid ${statusStyle.border}40`, color: statusStyle.text }}
                   >
                     {statusStyle.icon} {statusStyle.label}
                     {status === 'graded' && completion?.grade && (
@@ -127,32 +126,19 @@ export function MissionSystem({ studentId, onMissionComplete }: MissionSystemPro
                 )}
               </div>
 
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-space-border">
+              <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--color-border)' }}>
                 <div className="flex gap-4">
-                  <span className="text-sm neon-text-green font-mono font-bold">+{mission.xp_reward} XP</span>
-                  <span className="text-sm neon-text-warning font-mono">+{mission.coins_reward} 💰</span>
+                  <span className="text-sm font-mono font-bold" style={{ color: 'var(--color-status-success)' }}>+{mission.xp_reward} XP</span>
+                  <span className="text-sm font-mono" style={{ color: 'var(--color-status-warn)' }}>+{mission.coins_reward} 💰</span>
                   {mission.gems_reward > 0 && (
-                    <span className="text-sm neon-text-premium font-mono">+{mission.gems_reward} 💎</span>
+                    <span className="text-sm font-mono" style={{ color: 'var(--color-accent)' }}>+{mission.gems_reward} 💎</span>
                   )}
                 </div>
 
                 {!completion && (
                   <button
                     onClick={() => startMission(mission.id)}
-                    className="px-5 py-2 rounded-lg font-bold text-sm transition-all duration-300"
-                    style={{
-                      background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-                      color: '#0A0E1A',
-                      boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 25px rgba(0, 212, 255, 0.5)'
-                      e.currentTarget.style.transform = 'translateY(-1px)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 212, 255, 0.3)'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                    }}
+                    className="btn-accent px-5 py-2 rounded-lg font-bold text-sm"
                   >
                     {t('missionStart')}
                   </button>

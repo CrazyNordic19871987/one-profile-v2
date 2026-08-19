@@ -30,13 +30,13 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
 
   if (!hasAnyXp) {
     return (
-      <div className="radar-empty-shimmer rounded-xl p-6 text-center" style={{
-        background: 'linear-gradient(135deg, rgba(18, 24, 43, 0.6), rgba(30, 37, 56, 0.4))',
-        border: '1px dashed rgba(0, 212, 255, 0.2)',
+      <div className="gc rounded-xl p-6 text-center" style={{
+        background: 'var(--color-glass)',
+        border: '1px dashed var(--color-border)',
       }}>
         <div className="text-4xl mb-3 opacity-40" aria-hidden="true">🕸️</div>
-        <p className="text-sm font-bold text-cosmic-silver mb-1">{t('radarEmpty')}</p>
-        <p className="text-xs" style={{ color: '#A0AAB8' }}>{t('radarEmptyDesc')}</p>
+        <p className="text-sm font-bold mb-1" style={{ color: 'var(--color-muted)' }}>{t('radarEmpty')}</p>
+        <p className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('radarEmptyDesc')}</p>
       </div>
     )
   }
@@ -51,7 +51,7 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
             cy={center}
             r={maxRadius * level}
             fill="none"
-            stroke="#1E2538"
+            stroke="rgba(255,255,255,0.1)"
             strokeWidth="1"
           />
         ))}
@@ -67,7 +67,7 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
               y1={center}
               x2={x}
               y2={y}
-              stroke="#1E2538"
+              stroke="rgba(255,255,255,0.1)"
               strokeWidth="1"
             />
           )
@@ -75,8 +75,8 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
 
         <polygon
           points={points.map(p => `${p.x},${p.y}`).join(' ')}
-          fill="rgba(0, 212, 255, 0.2)"
-          stroke="#00D4FF"
+          fill="rgba(237, 118, 21, 0.12)"
+          stroke="#ed7615"
           strokeWidth="2"
         />
 
@@ -87,7 +87,7 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
             cy={p.y}
             r="4"
             fill={p.dir.color}
-            stroke="#0A0E1A"
+            stroke="var(--color-navy-dark)"
             strokeWidth="2"
           />
         ))}
@@ -104,7 +104,7 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
               y={y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="#8B95A8"
+              fill="rgba(255,255,255,0.5)"
               fontSize="10"
             >
               {dir.icon}
@@ -130,7 +130,7 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: dir.color }}
               />
-              <span className="text-cosmic-silver">{dir.icon} {dir.name}</span>
+              <span style={{ color: 'var(--color-muted)' }}>{dir.icon} {dir.name}</span>
               <span className="font-mono ml-auto">{xp}</span>
             </div>
           )

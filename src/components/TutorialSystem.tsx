@@ -72,61 +72,58 @@ export function TutorialSystem({ onComplete }: TutorialSystemProps) {
   }
 
   return (
-    <div className="min-h-screen bg-space-deep text-star-white flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--color-navy)' }}>
       <div className="max-w-md w-full">
-        {/* Progress */}
         <div className="mb-6">
           <div className="flex justify-between text-sm mb-1">
             <span>{t('tutorial')}</span>
-            <span className="font-mono text-plasma-cyan">{currentStep + 1}/{TUTORIAL_STEPS.length}</span>
+            <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{currentStep + 1}/{TUTORIAL_STEPS.length}</span>
           </div>
-          <div className="h-2 bg-space-gray rounded-full overflow-hidden">
+          <div className="progress-bar">
             <div
-              className="h-full bg-gradient-to-r from-plasma-cyan to-status-success rounded-full transition-all duration-500"
+              className="progress-bar-fill transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="bg-space-nebula rounded-xl p-8 border border-space-border text-center">
+        <div className="gc-lg p-8 text-center">
           <div className="text-6xl mb-6">{step.icon}</div>
           <h2 className="text-2xl font-bold mb-4">
             {lang === 'ru' ? t(step.title as keyof Translations) : t(step.titleEn as keyof Translations)}
           </h2>
-          <p className="text-cosmic-silver mb-6">
+          <p className="mb-6" style={{ color: 'var(--color-muted)' }}>
             {lang === 'ru' ? t(step.description as keyof Translations) : t(step.descriptionEn as keyof Translations)}
           </p>
 
-          {/* Navigation */}
           <div className="flex gap-3">
             <button
               onClick={handleSkip}
-              className="flex-1 py-3 bg-space-gray text-cosmic-silver rounded-lg hover:bg-space-border transition-colors"
+              className="flex-1 btn-ghost"
             >
               {t('skip')}
             </button>
             <button
               onClick={handleNext}
-              className="flex-1 py-3 bg-plasma-cyan text-space-deep rounded-lg font-bold hover:bg-plasma-blue transition-colors"
+              className="flex-1 btn-accent"
             >
               {currentStep < TUTORIAL_STEPS.length - 1 ? t('next') : t('start')}
             </button>
           </div>
         </div>
 
-        {/* Step Indicators */}
         <div className="flex justify-center gap-2 mt-4">
           {TUTORIAL_STEPS.map((_, index) => (
             <div
               key={index}
-              className={`w-2 h-2 rounded-full ${
-                index === currentStep
-                  ? 'bg-plasma-cyan'
+              className="w-2 h-2 rounded-full"
+              style={{
+                background: index === currentStep
+                  ? 'var(--color-accent)'
                   : index < currentStep
-                    ? 'bg-status-success'
-                    : 'bg-space-gray'
-              }`}
+                    ? 'var(--color-status-success)'
+                    : 'var(--color-glass-b)',
+              }}
             />
           ))}
         </div>

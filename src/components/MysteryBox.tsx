@@ -85,13 +85,12 @@ export function MysteryBox({ studentId, coins, onOpened }: MysteryBoxProps) {
 
   if (reward) {
     return (
-      <div className="neon-card neon-glow-purple p-4 text-center">
+      <div className="gc p-4 text-center">
         <div className="text-4xl mb-2 animate-bounce" aria-hidden="true">{reward.emoji}</div>
-        <p className="text-sm font-bold neon-text-cyan">+{reward.amount} {t(reward.labelKey)}</p>
+        <p className="text-sm font-bold" style={{ color: 'var(--color-accent)' }}>+{reward.amount} {t(reward.labelKey)}</p>
         <button
           onClick={() => setReward(null)}
-          className="mt-3 px-4 py-1.5 rounded-lg text-xs font-bold transition-all"
-          style={{ background: 'rgba(30, 37, 56, 0.8)', color: '#A0AAB8' }}
+          className="mt-3 px-4 py-1.5 rounded-lg text-xs font-bold transition-all btn-ghost"
         >
           OK
         </button>
@@ -100,33 +99,26 @@ export function MysteryBox({ studentId, coins, onOpened }: MysteryBoxProps) {
   }
 
   return (
-    <div className={`neon-card p-4 scanlines ${canAfford ? 'neon-glow-purple' : ''}`}>
+    <div className="gc p-4">
       <div className="flex items-center gap-3">
         <div className="text-3xl" aria-hidden="true">📦</div>
         <div className="flex-1">
-          <h3 className="text-sm font-bold" style={{ color: '#E8F0FE' }}>
+          <h3 className="text-sm font-bold">
             {lang === 'ru' ? 'Тайный ящик' : 'Mystery Crate'}
           </h3>
-          <p className="text-xs" style={{ color: '#A0AAB8' }}>
+          <p className="text-xs" style={{ color: 'var(--color-muted)' }}>
             {CRATE_COST} 💰 → random reward
           </p>
         </div>
         <button
           onClick={handleOpen}
           disabled={!canAfford || loading}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-            canAfford ? '' : 'opacity-40 cursor-not-allowed'
-          }`}
-          style={canAfford ? {
-            background: 'linear-gradient(135deg, #B24BF3, #FF2D78)',
-            color: '#fff',
-            boxShadow: '0 0 15px rgba(178, 75, 243, 0.3)',
-          } : { background: 'rgba(30, 37, 56, 0.8)', color: '#8B95A8' }}
+          className={canAfford ? 'btn-accent' : 'btn-ghost opacity-40 cursor-not-allowed'}
         >
           {loading ? '...' : canAfford ? (lang === 'ru' ? 'Открыть' : 'Open') : (lang === 'ru' ? 'Недостаточно' : 'Need more')}
         </button>
       </div>
-      {error && <p className="text-xs text-status-error mt-2">{error}</p>}
+      {error && <p className="text-xs mt-2" style={{ color: 'var(--color-status-error)' }}>{error}</p>}
     </div>
   )
 }

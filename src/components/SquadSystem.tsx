@@ -18,7 +18,6 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
   }, [studentId])
 
   async function fetchData() {
-    // Get student's squad
     const { data: memberData } = await supabase
       .from('squad_members')
       .select('*')
@@ -26,7 +25,6 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
       .single()
 
     if (memberData) {
-      // Get squad details
       const { data: squadData } = await supabase
         .from('squads')
         .select('*')
@@ -35,7 +33,6 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
 
       setSquad(squadData)
 
-      // Get all squad members with student data
       const { data: membersData } = await supabase
         .from('squad_members')
         .select('*, student:students(*)')
@@ -61,17 +58,17 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
 
   if (!squad) {
     return (
-      <div className="bg-space-nebula rounded-lg p-6 border border-space-border text-center">
+      <div className="rounded-lg p-6 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
         <div className="text-4xl mb-4">👥</div>
         <h3 className="font-bold mb-2">{t('squadNoYet')}</h3>
-        <p className="text-cosmic-silver text-sm">
+        <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
           {t('squadNoYetDesc')}
         </p>
       </div>
@@ -83,15 +80,15 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
       <h2 className="text-xl font-bold">{t('squadTitle')}</h2>
 
       {/* Squad Header */}
-      <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
+      <div className="rounded-lg p-4" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold text-lg">{squad.name}</h3>
-            <p className="text-cosmic-silver text-sm">{members.length} {t('squadMembers')}</p>
+            <p className="text-sm" style={{ color: 'var(--color-muted)' }}>{members.length} {t('squadMembers')}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-mono text-plasma-cyan">Lvl {getSquadLevel()}</div>
-            <div className="text-xs text-cosmic-silver">{t('squadLevel')}</div>
+            <div className="text-2xl font-mono" style={{ color: 'var(--color-accent)' }}>Lvl {getSquadLevel()}</div>
+            <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('squadLevel')}</div>
           </div>
         </div>
 
@@ -99,13 +96,13 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
         <div className="mb-2">
           <div className="flex justify-between text-sm mb-1">
             <span>{t('squadProgress')}</span>
-            <span className="font-mono text-plasma-cyan">
+            <span className="font-mono" style={{ color: 'var(--color-accent)' }}>
               {Math.round(getSquadProgress() * 100)}%
             </span>
           </div>
-          <div className="h-3 bg-space-gray rounded-full overflow-hidden">
+          <div className="progress-bar">
             <div
-              className="h-full bg-gradient-to-r from-plasma-cyan to-status-success rounded-full transition-all duration-500"
+              className="progress-bar-fill"
               style={{ width: `${getSquadProgress() * 100}%` }}
             />
           </div>
@@ -113,36 +110,37 @@ export function SquadSystem({ studentId }: SquadSystemProps) {
       </div>
 
       {/* Squad Ship */}
-      <div className="bg-space-nebula rounded-lg p-4 border border-space-border text-center">
+      <div className="rounded-lg p-4 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
         <div className="text-6xl mb-2">🚀</div>
-        <div className="text-sm text-cosmic-silver">{t('squadShip')}</div>
-        <div className="font-mono text-plasma-cyan">
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('squadShip')}</div>
+        <div className="font-mono" style={{ color: 'var(--color-accent)' }}>
           {getShipStage(getSquadLevel())}
         </div>
       </div>
 
       {/* Members List */}
-      <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
+      <div className="rounded-lg p-4" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
         <h4 className="font-bold mb-3">{t('squadMembers')}</h4>
         <div className="space-y-2">
           {members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between p-2 bg-space-gray rounded"
+              className="flex items-center justify-between p-2 rounded"
+              style={{ background: 'var(--color-glass-b)' }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-space-border flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'var(--color-border)' }}>
                   <span className="text-sm">{member.student?.emoji || '👤'}</span>
                 </div>
                 <div>
                   <div className="font-medium">{member.student?.nickname || t('squadUnknown')}</div>
-                  <div className="text-xs text-cosmic-silver">
+                  <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
                     {t('level')} {levelFromXp(member.student?.total_xp || 0)}
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-mono text-sm text-status-success">
+                <div className="font-mono text-sm" style={{ color: 'var(--color-status-success)' }}>
                   {member.student?.total_xp || 0} XP
                 </div>
               </div>

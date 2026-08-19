@@ -35,24 +35,24 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
 
   const rankStyles = [
-    { bg: 'linear-gradient(135deg, rgba(255, 215, 64, 0.15), rgba(255, 145, 0, 0.1))', border: '#FFD740', glow: '0 0 20px rgba(255, 215, 64, 0.3)', text: 'neon-text-warning', medal: '🥇' },
-    { bg: 'linear-gradient(135deg, rgba(139, 149, 168, 0.15), rgba(139, 149, 168, 0.05))', border: '#8B95A8', glow: '0 0 15px rgba(139, 149, 168, 0.2)', text: 'text-cosmic-silver', medal: '🥈' },
-    { bg: 'linear-gradient(135deg, rgba(255, 145, 0, 0.15), rgba(255, 145, 0, 0.05))', border: '#FF9100', glow: '0 0 15px rgba(255, 145, 0, 0.2)', text: 'neon-text-premium', medal: '🥉' },
+    { bg: 'rgba(255, 215, 64, 0.08)', border: '#FFD740', text: 'var(--color-status-warn)', medal: '🥇' },
+    { bg: 'rgba(139, 149, 168, 0.08)', border: '#8B95A8', text: 'var(--color-muted)', medal: '🥈' },
+    { bg: 'rgba(255, 145, 0, 0.08)', border: '#FF9100', text: 'var(--color-accent)', medal: '🥉' },
   ]
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h2 className="text-2xl font-bold neon-text-cyan">{t('leaderboardTitle')}</h2>
+    <div className="space-y-6 page-enter">
+      <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>{t('leaderboardTitle')}</h2>
 
-      <div className="neon-card overflow-hidden scanlines">
+      <div className="gc overflow-hidden">
         {entries.length === 0 ? (
-          <div className="p-8 text-center text-cosmic-silver">{t('leaderboardNoStudents')}</div>
+          <div className="p-8 text-center" style={{ color: 'var(--color-muted)' }}>{t('leaderboardNoStudents')}</div>
         ) : (
           entries.map((entry, index) => {
             const isCurrentStudent = entry.id === currentStudentId
@@ -64,42 +64,45 @@ export function LeaderboardUI({ currentStudentId }: LeaderboardUIProps) {
               <div
                 key={entry.id}
                 className={`flex items-center gap-4 p-4 transition-all ${
-                  index < entries.length - 1 ? 'border-b border-space-border' : ''
-                } ${isCurrentStudent ? 'bg-plasma-cyan/5' : 'hover:bg-space-gray/30'}`}
-                style={rank ? {
-                  background: rank.bg,
-                  boxShadow: isCurrentStudent ? rank.glow : 'none',
-                } : undefined}
+                  index < entries.length - 1 ? '' : ''
+                }`}
+                style={{
+                  borderBottom: index < entries.length - 1 ? '1px solid var(--color-border)' : undefined,
+                  background: isCurrentStudent ? 'var(--color-accent-dim)' : rank ? rank.bg : undefined,
+                }}
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                    rank ? rank.text : 'bg-space-gray text-cosmic-silver'
+                    !rank ? 'text-sm' : ''
                   }`}
-                  style={rank ? {
-                    background: `${rank.border}20`,
-                    border: `2px solid ${rank.border}60`,
-                    boxShadow: `0 0 10px ${rank.border}30`,
-                  } : undefined}
+                  style={!rank ? {
+                    background: 'var(--color-glass-b)',
+                    color: 'var(--color-muted)',
+                  } : {
+                    color: rank.text,
+                    background: `${rank.border}15`,
+                    border: `2px solid ${rank.border}40`,
+                  }}
                 >
                   {rank ? rank.medal : index + 1}
                 </div>
 
                 <div className="flex-1">
-                  <div className={`font-bold ${isCurrentStudent ? 'neon-text-cyan' : ''}`}>
+                  <div className={`font-bold ${isCurrentStudent ? '' : ''}`} style={isCurrentStudent ? { color: 'var(--color-accent)' } : undefined}>
                     {entry.nickname}
                     {isCurrentStudent && (
-                      <span className="text-xs ml-2 px-2 py-0.5 rounded-full bg-plasma-cyan/10 text-plasma-cyan font-mono">
+                      <span className="text-xs ml-2 px-2 py-0.5 rounded-full font-mono" style={{ background: 'var(--color-accent-dim)', color: 'var(--color-accent)' }}>
                         {t('leaderboardYou')}
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-cosmic-silver font-mono">
+                  <div className="text-xs font-mono" style={{ color: 'var(--color-muted)' }}>
                     {t('level')} {level} · {stage}
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-mono text-sm neon-text-green font-bold">
+                  <div className="font-mono text-sm font-bold" style={{ color: 'var(--color-status-success)' }}>
                     {(entry.total_xp || 0).toLocaleString()} XP
                   </div>
                 </div>

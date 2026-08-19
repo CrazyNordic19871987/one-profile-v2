@@ -80,9 +80,9 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
 
   function getStatusColor(status: string): string {
     switch (status) {
-      case 'completed': return 'text-status-success'
-      case 'in_progress': return 'text-plasma-cyan'
-      default: return 'text-cosmic-silver'
+      case 'completed': return 'var(--color-status-success)'
+      case 'in_progress': return 'var(--color-accent)'
+      default: return 'var(--color-muted)'
     }
   }
 
@@ -97,7 +97,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
@@ -108,7 +108,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
         <h2 className="text-xl font-bold">📊 {t('projectTracker')}</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
+          className="btn-accent px-3 py-1 rounded text-sm font-bold"
         >
           {showForm ? t('cancel') : t('projectNew')}
         </button>
@@ -116,29 +116,29 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
 
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
-          <div className="text-2xl font-mono text-plasma-cyan">
+        <div className="rounded-lg p-3 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
+          <div className="text-2xl font-mono" style={{ color: 'var(--color-accent)' }}>
             {projects.filter(p => p.status === 'in_progress').length}
           </div>
-          <div className="text-xs text-cosmic-silver">{t('projectActive')}</div>
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('projectActive')}</div>
         </div>
-        <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
-          <div className="text-2xl font-mono text-status-success">
+        <div className="rounded-lg p-3 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
+          <div className="text-2xl font-mono" style={{ color: 'var(--color-status-success)' }}>
             {projects.filter(p => p.status === 'completed').length}
           </div>
-          <div className="text-xs text-cosmic-silver">{t('projectCompleted')}</div>
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('projectCompleted')}</div>
         </div>
-        <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
-          <div className="text-2xl font-mono text-status-warning">
+        <div className="rounded-lg p-3 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
+          <div className="text-2xl font-mono" style={{ color: 'var(--color-status-warn)' }}>
             {projects.reduce((sum, p) => sum + p.xp_earned, 0)}
           </div>
-          <div className="text-xs text-cosmic-silver">{t('projectTotalXp')}</div>
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('projectTotalXp')}</div>
         </div>
       </div>
 
       {/* Add Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-space-nebula rounded-lg p-4 border border-space-border">
+        <form onSubmit={handleSubmit} className="rounded-lg p-4" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
           <div className="space-y-3">
             <div>
               <label className="block text-sm mb-1">{t('projectTitle')}</label>
@@ -147,7 +147,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder={t('projectTitlePlaceholder')}
-                className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
+                className="input w-full"
                 required
               />
             </div>
@@ -158,7 +158,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder={t('projectDescPlaceholder')}
-                className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none h-20 resize-none"
+                className="input w-full h-20 resize-none"
               />
             </div>
 
@@ -167,7 +167,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
               <select
                 value={formData.direction}
                 onChange={(e) => setFormData({ ...formData, direction: e.target.value as Project['direction'] })}
-                className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
+                className="input w-full"
               >
                 {DIRECTIONS.map((dir) => (
                   <option key={dir.id} value={dir.id}>
@@ -179,7 +179,7 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
 
             <button
               type="submit"
-              className="w-full py-2 bg-status-success text-space-deep rounded font-bold hover:opacity-90 transition-opacity"
+              className="btn-accent w-full py-2 rounded font-bold"
             >
               {t('projectCreate')}
             </button>
@@ -192,22 +192,23 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
         {projects.map((project) => (
           <div
             key={project.id}
-            className="bg-space-nebula rounded-lg p-4 border border-space-border"
+            className="rounded-lg p-4"
+            style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}
           >
             <div className="flex items-start justify-between mb-2">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span>{getDirectionIcon(project.direction)}</span>
-                  <span className="text-sm text-cosmic-silver">
+                  <span className="text-sm" style={{ color: 'var(--color-muted)' }}>
                     {getDirectionName(project.direction)}
                   </span>
-                  <span className={getStatusColor(project.status)}>
+                  <span style={{ color: getStatusColor(project.status) }}>
                     {getStatusIcon(project.status)}
                   </span>
                 </div>
                 <h3 className="font-bold">{project.title}</h3>
                 {project.description && (
-                  <p className="text-sm text-cosmic-silver mt-1">{project.description}</p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>{project.description}</p>
                 )}
               </div>
             </div>
@@ -216,31 +217,30 @@ export function ProjectTracker({ studentId, onProjectComplete }: ProjectTrackerP
             <div className="mb-3">
               <div className="flex justify-between text-sm mb-1">
                 <span>{t('projectMilestones')}</span>
-                <span className="font-mono text-plasma-cyan">{project.milestone}/5</span>
+                <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{project.milestone}/5</span>
               </div>
               <div className="flex gap-1">
                 {Array.from({ length: 5 }, (_, i) => (
                   <div
                     key={i}
-                    className={`flex-1 h-2 rounded ${
-                      i < project.milestone
-                        ? 'bg-status-success'
-                        : 'bg-space-gray'
-                    }`}
+                    className={`flex-1 h-2 rounded`}
+                    style={{
+                      background: i < project.milestone ? 'var(--color-status-success)' : 'var(--color-glass-b)',
+                    }}
                   />
                 ))}
               </div>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="font-mono text-sm text-status-success">
+              <div className="font-mono text-sm" style={{ color: 'var(--color-status-success)' }}>
                 +{project.xp_earned} XP
               </div>
 
               {project.status === 'in_progress' && project.milestone < 5 && (
                 <button
                   onClick={() => completeMilestone(project.id, project.milestone)}
-                  className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
+                  className="btn-accent px-3 py-1 rounded text-sm font-bold"
                 >
                   {t('projectMilestone')}
                 </button>

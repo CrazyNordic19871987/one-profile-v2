@@ -78,7 +78,7 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-cosmic-silver">{t('loading')}</div>
+        <div className="skeleton">{t('loading')}</div>
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
         <h2 className="text-xl font-bold">🏃 {t('sportTracker')}</h2>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-3 py-1 bg-plasma-cyan text-space-deep rounded text-sm font-bold hover:bg-plasma-blue transition-colors"
+          className="btn-accent px-3 py-1 rounded text-sm font-bold"
         >
           {showForm ? t('cancel') : t('sportAddSession')}
         </button>
@@ -97,19 +97,19 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
-          <div className="text-2xl font-mono text-status-success">{getTotalXp()}</div>
-          <div className="text-xs text-cosmic-silver">{t('sportTotalXp')}</div>
+        <div className="rounded-lg p-3 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
+          <div className="text-2xl font-mono" style={{ color: 'var(--color-status-success)' }}>{getTotalXp()}</div>
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('sportTotalXp')}</div>
         </div>
-        <div className="bg-space-nebula rounded-lg p-3 border border-space-border text-center">
-          <div className="text-2xl font-mono text-plasma-cyan">{getTotalMinutes()}</div>
-          <div className="text-xs text-cosmic-silver">{t('sportTotalMinutes')}</div>
+        <div className="rounded-lg p-3 text-center" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
+          <div className="text-2xl font-mono" style={{ color: 'var(--color-accent)' }}>{getTotalMinutes()}</div>
+          <div className="text-xs" style={{ color: 'var(--color-muted)' }}>{t('sportTotalMinutes')}</div>
         </div>
       </div>
 
       {/* Add Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-space-nebula rounded-lg p-4 border border-space-border">
+        <form onSubmit={handleSubmit} className="rounded-lg p-4" style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}>
           <div className="space-y-3">
             <div>
               <label className="block text-sm mb-1">{t('sportActivity')}</label>
@@ -118,7 +118,7 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
                 value={formData.activity}
                 onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
                 placeholder={t('sportPlaceholder')}
-                className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
+                className="input w-full"
                 required
               />
             </div>
@@ -131,7 +131,7 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 0 })}
                 min="1"
                 max="180"
-                className="w-full px-3 py-2 bg-space-gray rounded border border-space-border focus:border-plasma-cyan focus:outline-none"
+                className="input w-full"
               />
             </div>
 
@@ -145,9 +145,14 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
                     onClick={() => setFormData({ ...formData, intensity: level })}
                     className={`flex-1 py-2 rounded border ${
                       formData.intensity === level
-                        ? 'bg-plasma-cyan text-space-deep border-plasma-cyan'
-                        : 'bg-space-gray text-cosmic-silver border-space-border hover:border-plasma-cyan'
+                        ? 'btn-accent'
+                        : 'text-sm border-transparent hover:border-transparent'
                     }`}
+                    style={formData.intensity !== level ? {
+                      background: 'var(--color-glass-b)',
+                      color: 'var(--color-muted)',
+                      borderColor: 'var(--color-border)',
+                    } : undefined}
                   >
                     {getIntensityIcon(level)} {level}
                   </button>
@@ -155,13 +160,13 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
               </div>
             </div>
 
-            <div className="text-sm text-cosmic-silver">
+            <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
               {t('sportEstimatedXp')} +{Math.round((formData.duration_minutes / 10) * (formData.intensity === 'high' ? 15 : formData.intensity === 'medium' ? 10 : 5))}
             </div>
 
             <button
               type="submit"
-              className="w-full py-2 bg-status-success text-space-deep rounded font-bold hover:opacity-90 transition-opacity"
+              className="btn-accent w-full py-2 rounded font-bold"
             >
               {t('sportSave')}
             </button>
@@ -174,18 +179,19 @@ export function SportTracker({ studentId, onStatAdded }: SportTrackerProps) {
         {stats.map((stat) => (
           <div
             key={stat.id}
-            className="bg-space-nebula rounded-lg p-3 border border-space-border"
+            className="rounded-lg p-3"
+            style={{ background: 'var(--color-navy-light)', border: '1px solid var(--color-border)' }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-medium">{stat.activity}</div>
-                <div className="text-sm text-cosmic-silver">
+                <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
                   {stat.duration_minutes} min • {getIntensityIcon(stat.intensity)} {stat.intensity}
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-mono text-status-success">+{stat.xp_earned} XP</div>
-                <div className="text-xs text-cosmic-silver">
+                <div className="font-mono" style={{ color: 'var(--color-status-success)' }}>+{stat.xp_earned} XP</div>
+                <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
                   {new Date(stat.recorded_at).toLocaleDateString()}
                 </div>
               </div>

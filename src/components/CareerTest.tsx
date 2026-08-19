@@ -121,24 +121,24 @@ export function CareerTest({ onComplete }: CareerTestProps) {
   if (showResult && recommended) {
     const dir = DIRECTIONS.find(d => d.id === recommended)
     return (
-      <div className="neon-card p-6 text-center scanlines">
+      <div className="gc p-6 text-center">
         <div className="text-6xl mb-4">{dir?.icon}</div>
-        <h2 className="text-2xl font-bold mb-2 neon-text-cyan">
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-accent)' }}>
           {lang === 'ru' ? 'Твой путь: ' : 'Your Path: '}{lang === 'ru' ? dir?.name : dir?.nameEn}
         </h2>
-        <p className="text-cosmic-silver mb-6">
+        <p className="mb-6" style={{ color: 'var(--color-muted)' }}>
           {lang === 'ru' ? 'По твоим ответам, стоит сосредоточиться на ' : 'Based on your answers, you should focus on '}
-          <strong className="neon-text-cyan">{lang === 'ru' ? dir?.name : dir?.nameEn}</strong>!
+          <strong style={{ color: 'var(--color-accent)' }}>{lang === 'ru' ? dir?.name : dir?.nameEn}</strong>!
         </p>
-        <div className="bg-space-gray/50 rounded-lg p-4 mb-6">
-          <div className="text-sm text-cosmic-silver mb-2">
+        <div className="rounded-lg p-4 mb-6" style={{ background: 'var(--color-glass-b)' }}>
+          <div className="text-sm mb-2" style={{ color: 'var(--color-muted)' }}>
             {lang === 'ru' ? 'Твои ответы показали:' : 'Your answers showed:'}
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             {[...new Set(answers)].map((a, i) => {
               const d = DIRECTIONS.find(dd => dd.id === a)
               return (
-                <span key={i} className="px-2 py-1 bg-space-border rounded text-sm">
+                <span key={i} className="px-2 py-1 rounded text-sm" style={{ background: 'var(--color-glass)', border: '1px solid var(--color-border)' }}>
                   {d?.icon} {lang === 'ru' ? d?.name : d?.nameEn}
                 </span>
               )
@@ -147,12 +147,7 @@ export function CareerTest({ onComplete }: CareerTestProps) {
         </div>
         <button
           onClick={handleFinish}
-          className="px-6 py-3 rounded-lg font-bold transition-all"
-          style={{
-            background: 'linear-gradient(135deg, #00D4FF, #4A90D9)',
-            color: '#0A0E1A',
-            boxShadow: '0 0 15px rgba(0, 212, 255, 0.3)',
-          }}
+          className="btn-accent px-6 py-3 rounded-lg font-bold transition-all"
         >
           {lang === 'ru' ? 'Начать путешествие' : 'Start Your Journey'}
         </button>
@@ -164,20 +159,16 @@ export function CareerTest({ onComplete }: CareerTestProps) {
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100
 
   return (
-    <div className="neon-card p-6 scanlines">
+    <div className="gc p-6">
       <div className="mb-6">
         <div className="flex justify-between text-sm mb-1">
           <span>{t('careerTitle')}</span>
-          <span className="font-mono neon-text-cyan">{currentQuestion + 1}/{QUESTIONS.length}</span>
+          <span className="font-mono" style={{ color: 'var(--color-accent)' }}>{currentQuestion + 1}/{QUESTIONS.length}</span>
         </div>
-        <div className="h-2 bg-space-deep rounded-full overflow-hidden">
+        <div className="progress-bar">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress}%`,
-              background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
-              boxShadow: '0 0 8px rgba(0, 212, 255, 0.5)',
-            }}
+            className="progress-bar-fill"
+            style={{ width: `${progress}%` }}
           />
         </div>
       </div>
@@ -191,7 +182,7 @@ export function CareerTest({ onComplete }: CareerTestProps) {
           <button
             key={option.value}
             onClick={() => handleAnswer(option.value)}
-            className="neon-card p-4 text-left transition-all"
+            className="gc p-4 text-left transition-all hover:translate-y-[-1px]"
           >
             {lang === 'ru' ? option.label : option.labelEn}
           </button>

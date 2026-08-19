@@ -31,60 +31,58 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">⭐ {t('prestigeTitle')}</h2>
-        <div className="text-sm text-cosmic-silver">{t('prestigeConstellations')}: {prestigeCount}</div>
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('prestigeConstellations')}: {prestigeCount}</div>
       </div>
 
-      {/* Current Status */}
-      <div className="bg-space-nebula rounded-xl p-6 border border-space-border text-center">
+      <div className="gc-lg p-6 text-center">
         <div className="text-6xl mb-4">🌌</div>
         <h3 className="text-xl font-bold mb-2">{t('prestigeStarConstellations')}</h3>
-        <p className="text-cosmic-silver mb-4">
+        <p style={{ color: 'var(--color-muted)' }} className="mb-4">
           {t('prestigeReachLevel').replace('{level}', String(MAX_LEVEL))}
         </p>
 
-        {/* Constellation Progress */}
         <div className="flex justify-center gap-2 mb-4">
           {CONSTELLATIONS.map((c, i) => (
             <div
               key={c.name}
               className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-                i < prestigeCount
-                  ? 'bg-status-premium text-space-deep'
-                  : 'bg-space-gray text-cosmic-silver'
+                i < prestigeCount ? '' : ''
               }`}
+              style={i < prestigeCount
+                ? { background: 'var(--color-accent)', color: 'var(--color-navy-dark)' }
+                : { background: 'var(--color-glass-b)', color: 'var(--color-muted)' }
+              }
             >
               {c.icon}
             </div>
           ))}
         </div>
 
-        {/* Current Constellation */}
         {prestigeCount > 0 && (
-          <div className="bg-space-gray rounded-lg p-3 mb-4">
-            <div className="text-sm text-cosmic-silver">{t('prestigeCurrentBonus')}</div>
-            <div className="font-mono text-status-premium">
+          <div className="gc p-3 mb-4">
+            <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('prestigeCurrentBonus')}</div>
+            <div className="font-mono" style={{ color: 'var(--color-accent)' }}>
               {CONSTELLATIONS[(prestigeCount - 1) % CONSTELLATIONS.length].bonus}
             </div>
           </div>
         )}
 
-        {/* Prestige Button */}
         {canPrestige ? (
           showConfirm ? (
-            <div className="bg-space-gray rounded-lg p-4">
-              <p className="text-sm text-cosmic-silver mb-3">
+            <div className="gc p-4">
+              <p className="text-sm mb-3" style={{ color: 'var(--color-muted)' }}>
                 Reset to level 1 and unlock {nextConstellation.name} constellation?
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={handlePrestige}
-                  className="flex-1 py-2 bg-status-premium text-space-deep rounded font-bold hover:opacity-90"
+                  className="flex-1 btn-accent"
                 >
                   {t('prestigeNow')}
                 </button>
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="px-4 py-2 bg-space-gray text-cosmic-silver rounded hover:bg-space-border"
+                  className="btn-ghost"
                 >
                   {t('cancel')}
                 </button>
@@ -93,19 +91,19 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
           ) : (
             <button
               onClick={() => setShowConfirm(true)}
-              className="w-full py-3 bg-gradient-to-r from-status-premium to-status-warning text-space-deep rounded-lg font-bold hover:opacity-90 transition-opacity"
+              className="w-full btn-accent"
             >
               ⭐ {t('prestigeNow')}
             </button>
           )
         ) : (
           <div>
-            <div className="text-sm text-cosmic-silver mb-2">
+            <div className="text-sm mb-2" style={{ color: 'var(--color-muted)' }}>
               {t('level')} {level} / {MAX_LEVEL}
             </div>
-            <div className="h-3 bg-space-gray rounded-full overflow-hidden max-w-xs mx-auto">
+            <div className="progress-bar max-w-xs mx-auto">
               <div
-                className="h-full bg-gradient-to-r from-status-premium to-status-warning rounded-full transition-all duration-500"
+                className="progress-bar-fill transition-all duration-500"
                 style={{ width: `${(level / MAX_LEVEL) * 100}%` }}
               />
             </div>
@@ -113,14 +111,13 @@ export function PrestigeSystem({ totalXp, prestigeCount, onPrestige }: PrestigeS
         )}
       </div>
 
-      {/* Next Constellation Preview */}
-      <div className="bg-space-nebula rounded-lg p-4 border border-space-border">
+      <div className="gc p-4">
         <h4 className="font-bold mb-2">{t('shipNext')} {nextConstellation.name}</h4>
         <div className="flex items-center gap-3">
           <span className="text-3xl">{nextConstellation.icon}</span>
           <div>
-            <div className="text-sm text-cosmic-silver">{t('prestigeBonus')}: {nextConstellation.bonus}</div>
-            <div className="text-xs text-cosmic-silver">
+            <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{t('prestigeBonus')}: {nextConstellation.bonus}</div>
+            <div className="text-xs" style={{ color: 'var(--color-muted2)' }}>
               {prestigeCount + 1} of {CONSTELLATIONS.length} {t('prestigeConstellations')}
             </div>
           </div>

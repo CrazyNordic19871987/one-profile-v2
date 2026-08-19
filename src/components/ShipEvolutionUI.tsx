@@ -13,19 +13,17 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
   const stageIcons = ['🛸', '🦅', '⚔️', '🛡️', '👑']
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h2 className="text-2xl font-bold neon-text-cyan">{t('shipEvolution')}</h2>
+    <div className="space-y-6 page-enter">
+      <h2 className="text-2xl font-bold" style={{ color: 'var(--color-accent)' }}>{t('shipEvolution')}</h2>
 
-      <div className="neon-card p-6 scanlines">
+      <div className="gc p-6">
         <div className="flex items-center justify-between relative">
-          {/* Connection line */}
-          <div className="absolute top-6 left-0 right-0 h-0.5 bg-space-gray" />
+          <div className="absolute top-6 left-0 right-0 h-0.5" style={{ background: 'var(--color-glass-b)' }} />
           <div
             className="absolute top-6 left-0 h-0.5 transition-all duration-700"
             style={{
               width: `${(currentIndex / (SHIP_STAGES.length - 1)) * 100}%`,
-              background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
-              boxShadow: '0 0 8px rgba(0, 212, 255, 0.5)',
+              background: 'var(--color-accent)',
             }}
           />
 
@@ -41,26 +39,26 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
                   }`}
                   style={{
                     background: isActive
-                      ? 'linear-gradient(135deg, #00D4FF, #B24BF3)'
+                      ? 'var(--color-accent)'
                       : isUnlocked
-                        ? 'rgba(0, 230, 118, 0.15)'
-                        : 'rgba(30, 37, 56, 0.8)',
-                    border: `2px solid ${isActive ? '#00D4FF' : isUnlocked ? '#00E67680' : '#2E354880'}`,
-                    boxShadow: isActive
-                      ? '0 0 20px rgba(0, 212, 255, 0.5)'
-                      : isUnlocked
-                        ? '0 0 10px rgba(0, 230, 118, 0.2)'
-                        : 'none',
+                        ? 'var(--color-accent-dim)'
+                        : 'var(--color-glass-b)',
+                    border: `2px solid ${isActive ? 'var(--color-accent)' : isUnlocked ? 'rgba(34,211,166,0.5)' : 'var(--color-border)'}`,
                   }}
                 >
                   {stageIcons[index]}
                 </div>
 
-                <div className={`text-xs font-bold ${isActive ? 'neon-text-cyan' : isUnlocked ? 'neon-text-green' : 'text-cosmic-silver'}`}>
+                <div
+                  className="text-xs font-bold"
+                  style={{
+                    color: isActive ? 'var(--color-accent)' : isUnlocked ? 'var(--color-status-success)' : 'var(--color-muted)',
+                  }}
+                >
                   {stage.stage}
                 </div>
 
-                <div className="text-[10px] text-cosmic-silver font-mono">
+                <div className="text-[10px] font-mono" style={{ color: 'var(--color-muted)' }}>
                   {stage.minLevel}–{stage.maxLevel === Infinity ? '∞' : stage.maxLevel}
                 </div>
               </div>
@@ -68,17 +66,12 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
           })}
         </div>
 
-        <div className="mt-8 pt-6 border-t border-space-border text-center">
-          <div
-            className="text-5xl mb-3"
-            style={{
-              filter: 'drop-shadow(0 0 15px rgba(0, 212, 255, 0.5))',
-            }}
-          >
+        <div className="mt-8 pt-6 border-t text-center" style={{ borderColor: 'var(--color-border)' }}>
+          <div className="text-5xl mb-3">
             {stageIcons[currentIndex]}
           </div>
-          <h3 className="text-xl font-bold neon-text-cyan">{currentStage}</h3>
-          <p className="text-sm text-cosmic-silver mt-1 font-mono">
+          <h3 className="text-xl font-bold" style={{ color: 'var(--color-accent)' }}>{currentStage}</h3>
+          <p className="text-sm mt-1 font-mono" style={{ color: 'var(--color-muted)' }}>
             {currentIndex < SHIP_STAGES.length - 1
               ? `${SHIP_STAGES[currentIndex + 1].minLevel - level} ${t('shipLevelsToNext')}`
               : t('shipMaxReached')}
@@ -87,19 +80,17 @@ export function ShipEvolutionUI({ level, onEvolutionComplete: _onEvolutionComple
       </div>
 
       {currentIndex < SHIP_STAGES.length - 1 && (
-        <div className="neon-card p-4">
+        <div className="gc p-4">
           <div className="flex items-center gap-4">
             <div
               className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(178, 75, 243, 0.1))',
-              }}
+              style={{ background: 'var(--color-accent-dim)' }}
             >
               {stageIcons[currentIndex + 1]}
             </div>
             <div>
               <h4 className="font-bold">{t('shipNext')} {SHIP_STAGES[currentIndex + 1].stage}</h4>
-              <div className="text-sm text-cosmic-silver font-mono">
+              <div className="text-sm font-mono" style={{ color: 'var(--color-muted)' }}>
                 {t('shipUnlocksAt')} {SHIP_STAGES[currentIndex + 1].minLevel}
               </div>
             </div>

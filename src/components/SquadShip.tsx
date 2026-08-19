@@ -11,33 +11,33 @@ export function SquadShip({ squadLevel, memberCount }: SquadShipProps) {
   const moduleCount = Math.min(memberCount, 8)
 
   return (
-    <div className="bg-space-nebula rounded-xl p-6 border border-space-border">
+    <div className="gc-lg p-6">
       <div className="text-center">
         <h3 className="text-xl font-bold mb-4">🚀 {t('squadShipTitle')}</h3>
-        
-        {/* Ship Visual */}
+
         <div className="relative inline-block mb-4">
           <div className="text-8xl">🚀</div>
-          <div className="absolute -top-2 -right-2 bg-plasma-cyan text-space-deep text-xs font-bold px-2 py-0.5 rounded">
+          <div
+            className="absolute -top-2 -right-2 text-xs font-bold px-2 py-0.5 rounded"
+            style={{ background: 'var(--color-accent)', color: 'var(--color-navy-dark)' }}
+          >
             Lvl {squadLevel}
           </div>
         </div>
 
-        <div className="font-mono text-plasma-cyan mb-2">{stage}</div>
-        
-        {/* Modules */}
+        <div className="font-mono mb-2" style={{ color: 'var(--color-accent)' }}>{stage}</div>
+
         <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 8 }, (_, i) => (
             <div
               key={i}
-              className={`w-3 h-3 rounded ${
-                i < moduleCount ? 'bg-plasma-cyan' : 'bg-space-gray'
-              }`}
+              className={`w-3 h-3 rounded`}
+              style={{ background: i < moduleCount ? 'var(--color-accent)' : 'var(--color-glass-b)' }}
             />
           ))}
         </div>
 
-        <div className="text-sm text-cosmic-silver">
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>
           {memberCount} {t('squadShipMembers')}
         </div>
       </div>

@@ -47,54 +47,46 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">🚀 {t('shipCustomization')}</h2>
-        <div className="text-sm text-cosmic-silver">{stage}</div>
+        <div className="text-sm" style={{ color: 'var(--color-muted)' }}>{stage}</div>
       </div>
 
-      {/* Ship Preview */}
-      <div className="bg-space-nebula rounded-xl p-6 border border-space-border text-center">
+      <div className="gc-lg p-6 text-center">
         <div className="text-8xl mb-4">🚀</div>
-        <div className="font-mono text-plasma-cyan">{stage}</div>
-        <div className="h-2 bg-space-gray rounded-full overflow-hidden mt-2 max-w-xs mx-auto">
+        <div className="font-mono" style={{ color: 'var(--color-accent)' }}>{stage}</div>
+        <div className="progress-bar mt-2 max-w-xs mx-auto">
           <div
-            className="h-full bg-gradient-to-r from-plasma-cyan to-status-success rounded-full"
+            className="progress-bar-fill"
             style={{ width: `${progress * 100}%` }}
           />
         </div>
-        <div className="text-xs text-cosmic-silver mt-1">
+        <div className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>
           Level {level} • {Math.round(progress * 100)}% {t('shipProgress')}
         </div>
       </div>
 
-      {/* Currency */}
       <div className="flex gap-4">
-        <div className="flex-1 bg-space-gray rounded-lg p-3 text-center">
+        <div className="flex-1 gc p-3 text-center">
           <div className="text-xl">💰</div>
-          <div className="font-mono text-status-warning">{coins}</div>
+          <div className="font-mono" style={{ color: 'var(--color-status-warn)' }}>{coins}</div>
         </div>
-        <div className="flex-1 bg-space-gray rounded-lg p-3 text-center">
+        <div className="flex-1 gc p-3 text-center">
           <div className="text-xl">💎</div>
-          <div className="font-mono text-status-premium">{gems}</div>
+          <div className="font-mono" style={{ color: 'var(--color-accent)' }}>{gems}</div>
         </div>
       </div>
 
-      {/* Category Filter */}
       <div className="flex gap-2 overflow-x-auto">
         {categories.map(cat => (
           <button
             key={cat}
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1 rounded text-sm whitespace-nowrap ${
-              selectedCategory === cat
-                ? 'bg-plasma-cyan text-space-deep'
-                : 'bg-space-gray text-cosmic-silver hover:bg-space-border'
-            }`}
+            className={selectedCategory === cat ? 'pill active' : 'pill'}
           >
             {cat === 'all' ? t('shipAll') : cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
         ))}
       </div>
 
-      {/* Items Grid */}
       <div className="grid grid-cols-2 gap-3">
         {filteredItems().map(item => {
           const owned = ownedItems.includes(item.id)
@@ -103,20 +95,17 @@ export function ShipCustomization({ level, coins, gems, onPurchase }: ShipCustom
           return (
             <div
               key={item.id}
-              className={`bg-space-nebula rounded-lg p-4 border transition-all ${
-                owned
-                  ? 'border-status-success'
-                  : canAfford
-                    ? 'border-space-border hover:border-plasma-cyan cursor-pointer'
-                    : 'border-space-border opacity-50'
+              className={`gc p-4 transition-all ${
+                owned ? '' : canAfford ? 'cursor-pointer' : 'opacity-50'
               }`}
+              style={owned ? { borderColor: 'var(--color-status-success)' } : undefined}
               onClick={() => !owned && canAfford && handlePurchase(item)}
             >
               <div className="text-center">
                 <div className="text-3xl mb-2">{item.icon}</div>
                 <h4 className="font-bold text-sm">{item.name}</h4>
-                <p className="text-xs text-cosmic-silver mt-1">{item.description}</p>
-                <div className={`mt-2 font-mono text-sm ${item.currency === 'gems' ? 'text-status-premium' : 'text-status-warning'}`}>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>{item.description}</p>
+                <div className="mt-2 font-mono text-sm" style={{ color: item.currency === 'gems' ? 'var(--color-accent)' : 'var(--color-status-warn)' }}>
                   {owned ? `✅ ${t('shipOwned')}` : `${item.cost} ${item.currency === 'gems' ? '💎' : '💰'}`}
                 </div>
               </div>

@@ -81,14 +81,14 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">📝 {t('obsTitle')}</h2>
-        <span className="text-sm text-cosmic-silver">{obsCount} {t('obsCount').toLowerCase()} · avg {avgScore}</span>
+        <span className="text-sm" style={{ color: 'var(--color-muted)' }}>{obsCount} {t('obsCount').toLowerCase()} · avg {avgScore}</span>
       </div>
 
       {/* Student selector */}
       <select
         value={selectedStudent}
         onChange={e => setSelectedStudent(e.target.value)}
-        className="w-full px-3 py-2.5 rounded-lg bg-space-gray border border-space-border text-white text-sm"
+        className="input w-full px-3 py-2.5 rounded-lg text-sm"
       >
         <option value="">{t('obsSelectStudent')}</option>
         {students.map(s => (
@@ -97,10 +97,10 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
       </select>
 
       {selectedStudent && (
-        <div className="neon-card p-4 space-y-4">
+        <div className="gc p-4 space-y-4">
           {/* Day selector */}
           <div>
-            <label className="block text-xs font-bold mb-2 neon-text-cyan">{t('obsSelectDay')}</label>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--color-accent)' }}>{t('obsSelectDay')}</label>
             <div className="flex flex-wrap gap-1.5">
               {DAYS.map(d => (
                 <button
@@ -108,10 +108,9 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
                   onClick={() => setDay(d)}
                   className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
                     day === d
-                      ? 'text-space-deep'
-                      : 'bg-space-gray text-cosmic-silver border border-space-border hover:border-plasma-cyan'
+                      ? 'pill active'
+                      : 'pill'
                   }`}
-                  style={day === d ? { background: 'linear-gradient(135deg, #00D4FF, #0090FF)' } : undefined}
                 >
                   {d}
                 </button>
@@ -121,7 +120,7 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
 
           {/* Track selector */}
           <div>
-            <label className="block text-xs font-bold mb-2 neon-text-cyan">{t('obsSelectTrack')}</label>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--color-accent)' }}>{t('obsSelectTrack')}</label>
             <div className="flex flex-wrap gap-1.5">
               {TRACKS.map(tr => (
                 <button
@@ -129,10 +128,9 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
                   onClick={() => setTrack(tr)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     track === tr
-                      ? 'text-space-deep'
-                      : 'bg-space-gray text-cosmic-silver border border-space-border hover:border-plasma-cyan'
+                      ? 'pill active'
+                      : 'pill'
                   }`}
-                  style={track === tr ? { background: 'linear-gradient(135deg, #00D4FF, #0090FF)' } : undefined}
                 >
                   {TRACK_NAMES[tr]?.icon} {lang === 'en' ? TRACK_NAMES[tr]?.en : TRACK_NAMES[tr]?.ru}
                 </button>
@@ -176,7 +174,8 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setInitiative(!initiative)}
-              className={`relative w-12 h-6 rounded-full transition-all ${initiative ? 'bg-status-success' : 'bg-space-gray border border-space-border'}`}
+              className={`relative w-12 h-6 rounded-full transition-all ${initiative ? 'bg-status-success' : ''}`}
+              style={!initiative ? { background: 'var(--color-navy-dark)', border: '1px solid var(--color-border)' } : undefined}
             >
               <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${initiative ? 'left-6' : 'left-0.5'}`} />
             </button>
@@ -188,7 +187,7 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder={t('obsNotes')}
-            className="w-full px-3 py-2 rounded-lg bg-space-gray border border-space-border text-white text-sm h-20 resize-none"
+            className="input w-full px-3 py-2 rounded-lg text-sm h-20 resize-none"
           />
 
           {/* Save */}
@@ -196,7 +195,7 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
             onClick={handleSave}
             disabled={saving}
             className={`w-full py-2.5 rounded-lg font-bold text-sm transition-all ${saved ? 'bg-status-success text-space-deep' : ''}`}
-            style={!saved ? { background: 'linear-gradient(135deg, #00D4FF, #0090FF)', color: '#0A0E1A' } : undefined}
+            style={!saved ? { background: 'var(--color-accent)', color: '#0A0E1A' } : undefined}
           >
             {saved ? `✅ ${t('obsSaved')}` : saving ? '...' : `💾 ${t('obsSave')}`}
           </button>
@@ -205,12 +204,12 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
 
       {/* History */}
       {selectedStudent && observations.length > 0 && (
-        <div className="neon-card p-4">
+        <div className="gc p-4">
           <h3 className="text-sm font-bold mb-3">{t('obsHistory')}</h3>
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {observations.map(obs => (
-              <div key={obs.id} className="flex items-center gap-3 p-2 rounded bg-space-gray border border-space-border">
-                <span className="text-sm font-bold" style={{ color: '#00D4FF', minWidth: '50px' }}>
+              <div key={obs.id} className="flex items-center gap-3 p-2 rounded" style={{ background: 'var(--color-navy-dark)', border: '1px solid var(--color-border)' }}>
+                <span className="text-sm font-bold" style={{ color: 'var(--color-accent)', minWidth: '50px' }}>
                   {t('obsDay')} {obs.day}
                 </span>
                 <span className="text-xs">
@@ -218,7 +217,7 @@ export function ObservationLog({ students, counselorId }: ObservationLogProps) {
                 </span>
                 <span className="text-xs">⭐{obs.independence}/{obs.quality}</span>
                 {obs.initiative && <span className="text-xs">🚀</span>}
-                <span className="text-xs text-cosmic-silver ml-auto">{new Date(obs.created_at).toLocaleDateString()}</span>
+                <span className="text-xs ml-auto" style={{ color: 'var(--color-muted)' }}>{new Date(obs.created_at).toLocaleDateString()}</span>
               </div>
             ))}
           </div>

@@ -41,7 +41,7 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
         const y = cy + r * Math.sin(angle)
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
       }
-      ctx.strokeStyle = 'rgba(0, 212, 255, 0.12)'
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)'
       ctx.lineWidth = 1
       ctx.stroke()
     }
@@ -52,7 +52,7 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
       ctx.beginPath()
       ctx.moveTo(cx, cy)
       ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle))
-      ctx.strokeStyle = 'rgba(0, 212, 255, 0.15)'
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)'
       ctx.lineWidth = 1
       ctx.stroke()
     }
@@ -68,9 +68,9 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
       const y = cy + r * Math.sin(angle)
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)
     }
-    ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+    ctx.fillStyle = 'rgba(237, 118, 21, 0.15)'
     ctx.fill()
-    ctx.strokeStyle = '#00D4FF'
+    ctx.strokeStyle = '#ed7615'
     ctx.lineWidth = 2
     ctx.stroke()
 
@@ -86,7 +86,7 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
       ctx.arc(x, y, 4, 0, 2 * Math.PI)
       ctx.fillStyle = COMPETENCIES[i].color
       ctx.fill()
-      ctx.strokeStyle = '#0A0E1A'
+      ctx.strokeStyle = '#0f1a35'
       ctx.lineWidth = 1.5
       ctx.stroke()
     }
@@ -104,7 +104,7 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
 
       ctx.fillStyle = COMPETENCIES[i].color
       ctx.fillText(COMPETENCIES[i].icon, x, y - 6)
-      ctx.fillStyle = '#A0AAB8'
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
       ctx.font = '8px Space Grotesk, sans-serif'
       const name = COMPETENCIES[i].nameRu.length > 10 ? COMPETENCIES[i].nameRu.slice(0, 10) + '.' : COMPETENCIES[i].nameRu
       ctx.fillText(name, x, y + 5)
@@ -116,7 +116,7 @@ export function CompetencyRadar({ scores, size = 240 }: CompetencyRadarProps) {
   return (
     <div className="flex flex-col items-center">
       <canvas ref={canvasRef} />
-      <p className="text-xs text-cosmic-silver mt-1">{t('radarCompetencies')}</p>
+      <p className="text-xs mt-1" style={{ color: 'var(--color-muted)' }}>{t('radarCompetencies')}</p>
     </div>
   )
 }
