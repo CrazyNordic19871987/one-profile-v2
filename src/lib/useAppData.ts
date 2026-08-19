@@ -34,12 +34,16 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
         return
       }
 
+      console.log('[ONE!] Auth OK, user.id:', user.id)
+
       // Find or create student profile linked to auth user
-      let { data: student } = await supabase
+      let { data: student, error: fetchErr } = await supabase
         .from('students')
         .select('*')
         .eq('id', user.id)
         .maybeSingle()
+
+      console.log('[ONE!] Student fetch:', student, 'error:', fetchErr)
 
       // Auto-create student profile if none exists
       if (!student) {
@@ -63,6 +67,7 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
 
         if (createError) throw new Error('Failed to create student: ' + createError.message)
         student = created
+        console.log('[ONE!] Student created:', created)
       }
 
       if (!student) throw new Error('No student found')

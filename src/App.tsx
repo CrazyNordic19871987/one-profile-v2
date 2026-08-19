@@ -118,7 +118,7 @@ function App() {
         <div className="text-center max-w-md">
           <div className="text-5xl mb-4">⚠️</div>
           <h2 className="text-xl font-bold mb-2">{t('error')}</h2>
-          <p className="text-cosmic-silver mb-4">{error || t('error')}</p>
+          <p className="text-cosmic-silver mb-4 font-mono text-xs break-all">{error || t('error')}</p>
           <button
             onClick={refetch}
             className="px-6 py-2 rounded-lg font-bold transition-all"
