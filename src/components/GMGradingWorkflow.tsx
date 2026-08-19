@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { creditMission } from '../lib/currency'
 import { t, getDirectionName, getDirectionIcon } from '../lib/i18n'
 import type { MissionCompletion, Mission, Student } from '../types/database'
 
@@ -12,6 +13,7 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
   const [loading, setLoading] = useState(true)
   const [selectedCompletion, setSelectedCompletion] = useState<string | null>(null)
   const [grade, setGrade] = useState<1 | 2 | 3 | 4 | 5>(3)
+  const [lastReward, setLastReward] = useState<{ xp: number; coins: number; gems: number } | null>(null)
 
   useEffect(() => {
     fetchPendingCompletions()
@@ -28,7 +30,8 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
     setLoading(false)
   }
 
-  async function handleGrade(completionId: string, _studentId: string) {
+  async function handleGrade(completionId: string, studentId: string) {
+    // Step 1: Mark as graded
     const { error } = await supabase
       .from('mission_completions')
       .update({
@@ -39,11 +42,22 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
       })
       .eq('id', completionId)
 
-    if (!error) {
-      setSelectedCompletion(null)
-      setGrade(3)
-      fetchPendingCompletions()
+    if (error) return
+
+    // Step 2: Credit rewards (XP, coins, gems, direction skill)
+    try {
+      const completion = pendingCompletions.find(c => c.id === completionId)
+      const direction = completion?.mission?.direction
+      const reward = await creditMission(completionId, studentId, grade, 'mission', direction)
+      setLastReward({ xp: reward.xp, coins: reward.coins, gems: reward.gems })
+      setTimeout(() => setLastReward(null), 3000)
+    } catch {
+      // Grading succeeded even if credit failed — can be retried manually
     }
+
+    setSelectedCompletion(null)
+    setGrade(3)
+    fetchPendingCompletions()
   }
 
   function getGradeColor(g: number): string {
@@ -79,6 +93,14 @@ export function GMGradingWorkflow({ gmId }: GMGradingWorkflowProps) {
           {pendingCompletions.length} {t('gmPending')}
         </div>
       </div>
+
+      {lastReward && (
+        <div className="bg-status-success/20 border border-status-success rounded-lg p-3 text-center animate-pulse">
+          <span className="text-sm font-bold text-status-success">
+            ✅ +{lastReward.xp} XP · +{lastReward.coins} 💰{lastReward.gems > 0 ? ` · +${lastReward.gems} 💎` : ''}
+          </span>
+        </div>
+      )}
 
       {pendingCompletions.length === 0 ? (
         <div className="bg-space-nebula rounded-lg p-8 border border-space-border text-center">
