@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from './supabase'
 import type { User } from '@supabase/supabase-js'
 import type { Student, Skill } from '../types/database'
@@ -22,11 +22,14 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
     error: null,
   })
 
+  const loadingRef = useRef(false)
+
   const load = useCallback(async () => {
+    if (loadingRef.current) return
+    loadingRef.current = true
     try {
       setState(s => ({ ...s, loading: true, error: null }))
 
-      // Get authenticated user
       const { data: { user }, error: authError } = await supabase.auth.getUser()
 
       if (authError || !user) {
@@ -34,18 +37,12 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
         return
       }
 
-      console.log('[ONE!] Auth OK, user.id:', user.id)
-
-      // Find or create student profile linked to auth user
-      let { data: student, error: fetchErr } = await supabase
+      let { data: student } = await supabase
         .from('students')
         .select('*')
         .eq('id', user.id)
         .maybeSingle()
 
-      console.log('[ONE!] Student fetch:', student, 'error:', fetchErr)
-
-      // Auto-create student profile if none exists
       if (!student) {
         const displayName = user.user_metadata?.name || user.email?.split('@')[0] || 'Space Explorer'
         const { data: created, error: createError } = await supabase
@@ -67,12 +64,10 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
 
         if (createError) throw new Error('Failed to create student: ' + createError.message)
         student = created
-        console.log('[ONE!] Student created:', created)
       }
 
       if (!student) throw new Error('No student found')
 
-      // Load skills
       const { data: skills } = await supabase
         .from('skills')
         .select('*')
@@ -92,6 +87,8 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
         loading: false,
         error: err instanceof Error ? err.message : 'Unknown error',
       }))
+    } finally {
+      loadingRef.current = false
     }
   }, [])
 
@@ -103,11 +100,8 @@ export function useAppData(): AppState & { refetch: () => Promise<void>; signOut
   useEffect(() => {
     load()
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        load()
-      } else {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event) => {
+      if (_event === 'SIGNED_OUT') {
         setState({ user: null, studentId: null, student: null, skills: [], loading: false, error: null })
       }
     })

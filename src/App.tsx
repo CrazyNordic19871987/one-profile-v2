@@ -138,8 +138,11 @@ function App() {
   const sid = studentId!
   const s = student!
 
-  // Evaluate badges on load
+  // Evaluate badges on load (once per session)
+  const badgesEvaluatedRef = useRef(false)
   useEffect(() => {
+    if (badgesEvaluatedRef.current || !sid) return
+    badgesEvaluatedRef.current = true
     evaluateBadges(sid).then(newBadges => {
       newBadges.forEach(name => addNotification('success', `${lang === 'ru' ? 'Бейдж получен' : 'Badge earned'}: ${name}`))
     }).catch(() => {})
