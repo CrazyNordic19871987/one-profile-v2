@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { t, setLocale, getLocale } from './lib/i18n'
 import { levelFromXp, xpInLevel, xpToNextLevel, getShipStage } from './lib/engine'
 import { useAppData } from './lib/useAppData'
@@ -27,7 +27,7 @@ import { ShipEvolutionUI } from './components/ShipEvolutionUI'
 import { TutorialSystem } from './components/TutorialSystem'
 import { NotificationSystem, useNotifications } from './components/NotificationSystem'
 
-type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm'
+type Tab = 'profile' | 'missions' | 'squad' | 'sport' | 'projects' | 'directions' | 'badges' | 'perks' | 'ship' | 'prestige' | 'gm' | 'more'
 
 const tabs: { id: Tab; icon: string; label: string }[] = [
   { id: 'profile', icon: '👤', label: t('navProfile') },
@@ -41,7 +41,12 @@ const tabs: { id: Tab; icon: string; label: string }[] = [
   { id: 'ship', icon: '🚀', label: t('navShip') },
   { id: 'prestige', icon: '⭐', label: t('navPrestige') },
   { id: 'gm', icon: '🎮', label: t('navGM') },
+  { id: 'more', icon: '⋯', label: t('navMore') },
 ]
+
+const PRIMARY_TABS: Tab[] = ['profile', 'missions', 'squad', 'badges', 'more']
+
+const OVERFLOW_TABS: Tab[] = ['sport', 'projects', 'directions', 'perks', 'ship', 'prestige', 'gm']
 
 function App() {
   const { studentId, student, skills, loading, error, refetch } = useAppData()
@@ -51,6 +56,8 @@ function App() {
   const [selectedDirection, setSelectedDirection] = useState<Direction | null>(null)
   const [showCareerTest, setShowCareerTest] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [showMoreDrawer, setShowMoreDrawer] = useState(false)
+  const moreDrawerRef = useRef<HTMLDivElement>(null)
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -88,7 +95,12 @@ function App() {
       <div className="h-screen bg-space-deep text-star-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-5xl mb-4 animate-pulse">🚀</div>
-          <div className="text-lg neon-text-cyan">{t('loading')} ONE! Profile...</div>
+          <div className="text-lg neon-text-cyan">{t('skeletonLoading')} ONE! Profile...</div>
+          <div className="mt-4 flex gap-1 justify-center">
+            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-plasma-cyan animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     )
@@ -259,7 +271,7 @@ function App() {
 
         {/* Nav Items */}
         <nav className="flex-1 overflow-y-auto py-2">
-          {tabs.map((tab) => {
+          {tabs.filter(tab => tab.id !== 'more').map((tab) => {
             const isActive = activeTab === tab.id
             return (
               <button
@@ -380,21 +392,29 @@ function App() {
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-space-border"
         style={{ background: 'linear-gradient(180deg, #0E1322 0%, #12182B 100%)' }}
       >
-        <div className="flex overflow-x-auto">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id
+        <div className="flex">
+          {PRIMARY_TABS.map((tabId) => {
+            const tab = tabs.find(t => t.id === tabId)!
+            const isActive = tabId === 'more' ? showMoreDrawer : activeTab === tabId
             return (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2.5 min-w-[56px] transition-all relative ${
+                key={tabId}
+                onClick={() => {
+                  if (tabId === 'more') {
+                    setShowMoreDrawer(!showMoreDrawer)
+                  } else {
+                    setShowMoreDrawer(false)
+                    setActiveTab(tabId)
+                  }
+                }}
+                className={`flex-shrink-0 flex flex-col items-center gap-0.5 px-3 py-2.5 flex-1 min-w-0 transition-all relative ${
                   isActive
                     ? 'text-plasma-cyan'
                     : 'text-cosmic-silver'
                 }`}
               >
                 <span className="text-xl">{tab.icon}</span>
-                <span className="text-[10px] leading-tight">{tab.label}</span>
+                <span className="text-[10px] leading-tight truncate">{tab.label}</span>
                 {isActive && (
                   <div
                     className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
@@ -409,6 +429,56 @@ function App() {
           })}
         </div>
       </nav>
+
+      {/* More Drawer Overlay */}
+      {showMoreDrawer && (
+        <div
+          className="md:hidden fixed inset-0 z-50"
+          onClick={() => setShowMoreDrawer(false)}
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+          <div
+            ref={moreDrawerRef}
+            className="absolute bottom-0 left-0 right-0 rounded-t-2xl border-t border-space-border animate-fade-in"
+            style={{ background: 'linear-gradient(180deg, #12182B 0%, #0E1322 100%)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-4 py-3 border-b border-space-border flex items-center justify-between">
+              <h3 className="text-sm font-bold neon-text-cyan">{t('navMoreDrawerTitle')}</h3>
+              <button
+                onClick={() => setShowMoreDrawer(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-cosmic-silver hover:text-star-white transition-colors"
+                style={{ background: 'rgba(30, 37, 56, 0.8)' }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-2 pb-8 grid grid-cols-4 gap-2">
+              {OVERFLOW_TABS.map((tabId) => {
+                const tab = tabs.find(t => t.id === tabId)!
+                const isActive = activeTab === tabId
+                return (
+                  <button
+                    key={tabId}
+                    onClick={() => {
+                      setActiveTab(tabId)
+                      setShowMoreDrawer(false)
+                    }}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl transition-all ${
+                      isActive
+                        ? 'bg-plasma-cyan/10 text-plasma-cyan'
+                        : 'text-cosmic-silver hover:bg-space-gray/50 hover:text-star-white'
+                    }`}
+                  >
+                    <span className="text-2xl">{tab.icon}</span>
+                    <span className="text-[10px] leading-tight text-center">{tab.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

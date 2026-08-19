@@ -1,11 +1,11 @@
 import type { Direction } from '../types/database'
 
 // === XP & Level Constants ===
-
+// Gentler curve: ~15-20% increment between levels, not 50-167%
 export const MAX_LEVEL = 100
 export const LEVEL_XP_BASE = 80
-export const LEVEL_XP_LINEAR = 20
-export const LEVEL_XP_QUADRATIC = 2
+export const LEVEL_XP_LINEAR = 25
+export const LEVEL_XP_QUADRATIC = 1.5
 
 // === Ship Stages ===
 

@@ -32,8 +32,16 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
     }
   }
 
-  function getStreakBonus(): number {
-    return Math.min(currentStreak + 1, 7)
+  function getNextXp(): number {
+    const nextStreak = currentStreak + 1
+    const streakBonus = Math.min(nextStreak, 7)
+    return 10 + (nextStreak * 5) + (streakBonus * 2)
+  }
+
+  function getNextCoins(): number {
+    const nextStreak = currentStreak + 1
+    const streakBonus = Math.min(nextStreak, 7)
+    return 5 + (nextStreak * 3) + (streakBonus * 1)
   }
 
   if (result) {
@@ -73,7 +81,8 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
           </div>
           <div className="neon-card px-4 py-3 text-center">
             <div className="text-xs text-cosmic-silver mb-1">{t('dailyBonusNext')}</div>
-            <div className="text-2xl font-mono font-bold neon-text-cyan">+{getStreakBonus()} XP</div>
+            <div className="text-lg font-mono font-bold neon-text-cyan">+{getNextXp()} XP</div>
+            <div className="text-xs font-mono neon-text-warning">+{getNextCoins()} 💰</div>
           </div>
         </div>
 

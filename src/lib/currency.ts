@@ -250,7 +250,7 @@ export async function claimDailyBonus(studentId: string): Promise<{ xp: number; 
     throw new Error('Daily bonus already claimed today')
   }
 
-  // Calculate streak
+  // Calculate streak — scale up: XP = 10 + (streak × 5) + (min(streak,7) × 2)
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayStr = yesterday.toISOString().split('T')[0]
@@ -258,8 +258,14 @@ export async function claimDailyBonus(studentId: string): Promise<{ xp: number; 
   const newStreak = lastBonus === yesterdayStr ? profile.streak + 1 : 1
   const streakBonus = Math.min(newStreak, 7)
 
-  const xp = 5 + streakBonus
-  const coins = 5 + Math.floor(streakBonus / 2)
+  const xp = 10 + (newStreak * 5) + (streakBonus * 2)
+  const coins = 5 + (newStreak * 3) + (streakBonus * 1)
+
+  // Day 7 milestone: bonus gems
+  if (newStreak >= 7) {
+    const gemsBonus = Math.floor(newStreak / 7) * 5
+    await addGems(studentId, gemsBonus, 'Daily bonus streak milestone')
+  }
 
   // Update profile
   await supabase

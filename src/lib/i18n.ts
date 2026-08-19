@@ -184,6 +184,11 @@ export interface Translations {
   direction: string
   difficulty: string
   intensity: string
+
+  navMore: string
+  navMoreDrawerTitle: string
+  dailyBonusGemsMilestone: string
+  skeletonLoading: string
 }
 
 const ru: Translations = {
@@ -370,6 +375,11 @@ const ru: Translations = {
   direction: 'Направление',
   difficulty: 'Сложность',
   intensity: 'Интенсивность',
+
+  navMore: 'Ещё',
+  navMoreDrawerTitle: 'Разделы',
+  dailyBonusGemsMilestone: 'Каждые 7 дней: +5 кристаллов!',
+  skeletonLoading: 'Загрузка...',
 }
 
 const en: Translations = {
@@ -556,6 +566,11 @@ const en: Translations = {
   direction: 'Direction',
   difficulty: 'Difficulty',
   intensity: 'Intensity',
+
+  navMore: 'More',
+  navMoreDrawerTitle: 'Sections',
+  dailyBonusGemsMilestone: 'Every 7 days: +5 gems!',
+  skeletonLoading: 'Loading...',
 }
 
 const translations: Record<Locale, Translations> = { ru, en }
