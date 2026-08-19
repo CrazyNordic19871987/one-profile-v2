@@ -59,6 +59,7 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [showMoreDrawer, setShowMoreDrawer] = useState(false)
   const moreDrawerRef = useRef<HTMLDivElement>(null)
+  const badgesEvaluatedRef = useRef(false)
 
   const handleLangChange = (newLang: Locale) => {
     setLang(newLang)
@@ -139,7 +140,6 @@ function App() {
   const s = student!
 
   // Evaluate badges on load (once per session)
-  const badgesEvaluatedRef = useRef(false)
   useEffect(() => {
     if (badgesEvaluatedRef.current || !sid) return
     badgesEvaluatedRef.current = true
