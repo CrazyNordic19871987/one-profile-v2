@@ -189,6 +189,20 @@ export interface Translations {
   navMoreDrawerTitle: string
   dailyBonusGemsMilestone: string
   skeletonLoading: string
+
+  xpToNextLevel: string
+  xpToNextLevelShort: string
+  nextGoal: string
+  nextGoalDesc: string
+  radarEmpty: string
+  radarEmptyDesc: string
+  coinsLabel: string
+  gemsLabel: string
+  streakLabel: string
+  dailyBonusDay7Special: string
+  dailyBonusFreezeCount: string
+  dailyBonusComeback: string
+  dailyBonusStreakFreezeUsed: string
 }
 
 const ru: Translations = {
@@ -380,6 +394,20 @@ const ru: Translations = {
   navMoreDrawerTitle: 'Разделы',
   dailyBonusGemsMilestone: 'Каждые 7 дней: +5 кристаллов!',
   skeletonLoading: 'Загрузка...',
+
+  xpToNextLevel: 'до уровня {level}',
+  xpToNextLevelShort: 'до ур. {level}',
+  nextGoal: 'Следующая цель',
+  nextGoalDesc: 'Получи {xp} XP для перехода на уровень {level}',
+  radarEmpty: 'Навыки закрыты',
+  radarEmptyDesc: 'Пройди первую миссию, чтобы увидеть свои навыки',
+  coinsLabel: 'Монеты',
+  gemsLabel: 'Кристаллы',
+  streakLabel: 'Серия',
+  dailyBonusDay7Special: 'День 7: особый бонус!',
+  dailyBonusFreezeCount: 'Заморозок: {count}',
+  dailyBonusComeback: 'Бонус возвращения! 2x XP',
+  dailyBonusStreakFreezeUsed: 'Заморозка серии использована!',
 }
 
 const en: Translations = {
@@ -571,6 +599,20 @@ const en: Translations = {
   navMoreDrawerTitle: 'Sections',
   dailyBonusGemsMilestone: 'Every 7 days: +5 gems!',
   skeletonLoading: 'Loading...',
+
+  xpToNextLevel: 'to level {level}',
+  xpToNextLevelShort: 'to Lv. {level}',
+  nextGoal: 'Next Goal',
+  nextGoalDesc: 'Get {xp} XP to reach level {level}',
+  radarEmpty: 'Skills Locked',
+  radarEmptyDesc: 'Complete your first mission to unlock skills',
+  coinsLabel: 'Coins',
+  gemsLabel: 'Gems',
+  streakLabel: 'Streak',
+  dailyBonusDay7Special: 'Day 7: Special Bonus!',
+  dailyBonusFreezeCount: 'Freezes: {count}',
+  dailyBonusComeback: 'Comeback Bonus! 2x XP',
+  dailyBonusStreakFreezeUsed: 'Streak Freeze used!',
 }
 
 const translations: Record<Locale, Translations> = { ru, en }

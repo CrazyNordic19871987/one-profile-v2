@@ -152,64 +152,104 @@ function App() {
     switch (activeTab) {
       case 'profile': return (
         <div className="space-y-4 animate-fade-in">
+          {/* Profile Header: Avatar + Name + Rank */}
           <div className="neon-card p-6 scanlines">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <div className="relative">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative flex-shrink-0">
                 <ShipVisual level={level} className="flex-shrink-0" />
               </div>
-              <div className="flex-1 text-center sm:text-left w-full">
-                <h2 className="text-2xl font-bold mb-1">{s.nickname}</h2>
-                <p className="text-cosmic-silver mb-3 font-mono text-sm">{t('profileLevel')} {level} · {shipStage}</p>
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-cosmic-silver">{t('xp')}</span>
-                    <span className="font-mono neon-text-cyan">{xpInCurrent} / {xpNeeded}</span>
-                  </div>
-                  <div className="h-2.5 bg-space-deep rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out"
-                      style={{
-                        width: `${xpProgress}%`,
-                        background: 'linear-gradient(90deg, #00D4FF, #B24BF3)',
-                        boxShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="neon-card p-3 text-center">
-                    <div className="text-lg mb-1">💰</div>
-                    <div className="font-mono text-sm neon-text-warning">{coins}</div>
-                  </div>
-                  <div className="neon-card p-3 text-center">
-                    <div className="text-lg mb-1">💎</div>
-                    <div className="font-mono text-sm neon-text-premium">{gems}</div>
-                  </div>
-                  <div className="neon-card p-3 text-center">
-                    <div className="text-lg mb-1">🔥</div>
-                    <div className="font-mono text-sm neon-text-green">{streak}</div>
-                  </div>
-                </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl font-bold truncate">{s.nickname}</h2>
+                <p className="text-xs font-mono mt-0.5" style={{ color: '#A0AAB8' }}>
+                  {shipStage}
+                </p>
+              </div>
+              <div className="neon-card px-3 py-1.5 text-center flex-shrink-0">
+                <div className="text-xs font-mono" style={{ color: '#A0AAB8' }}>{t('level')}</div>
+                <div className="text-lg font-mono font-bold neon-text-cyan">{level}</div>
               </div>
             </div>
-            <div className="mt-6 flex justify-center">
-              <SkillRadar skills={skills} size={260} />
+
+            {/* XP Bar — emotional: "До уровня X осталось Y XP" */}
+            <div className="mb-4">
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-mono neon-text-cyan">{xpInCurrent} XP</span>
+                <span className="font-mono" style={{ color: '#A0AAB8' }}>{xpNeeded} XP {t('xpToNextLevelShort').replace('{level}', String(level + 1))}</span>
+              </div>
+              <div className={`relative h-3 bg-space-deep rounded-full overflow-hidden ${xpProgress >= 80 ? 'xp-bar-near-level' : ''}`}
+                style={{ border: '1px solid rgba(46, 53, 72, 0.5)' }}>
+                <div
+                  className="h-full rounded-full transition-all duration-700 ease-out xp-bar-scan"
+                  style={{
+                    width: `${Math.max(xpProgress, 2)}%`,
+                    background: xpProgress >= 80
+                      ? 'linear-gradient(90deg, #00D4FF, #B24BF3, #00E676)'
+                      : xpProgress >= 50
+                        ? 'linear-gradient(90deg, #00D4FF, #B24BF3)'
+                        : 'linear-gradient(90deg, #4A90D9, #00D4FF)',
+                    boxShadow: xpProgress >= 80
+                      ? '0 0 12px rgba(0, 212, 255, 0.6), 0 0 20px rgba(178, 75, 243, 0.3)'
+                      : '0 0 8px rgba(0, 212, 255, 0.4)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Currency Cards — labeled, color-coded */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 215, 64, 0.2)' }}>
+                <div className="text-base mb-0.5">💰</div>
+                <div className="font-mono text-sm font-bold" style={{ color: '#FFD740' }}>{coins}</div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('coinsLabel')}</div>
+              </div>
+              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(0, 212, 255, 0.2)' }}>
+                <div className="text-base mb-0.5">💎</div>
+                <div className="font-mono text-sm font-bold" style={{ color: '#00D4FF' }}>{gems}</div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('gemsLabel')}</div>
+              </div>
+              <div className="neon-card p-3 text-center" style={{ borderColor: 'rgba(255, 145, 0, 0.2)' }}>
+                <div className="text-base mb-0.5">🔥</div>
+                <div className="font-mono text-sm font-bold" style={{ color: '#FF9100' }}>{streak}</div>
+                <div className="text-[10px] mt-0.5" style={{ color: '#A0AAB8' }}>{t('streakLabel')}</div>
+              </div>
             </div>
           </div>
+
+          {/* Skill Radar — shrunk, with empty state */}
+          <div className="neon-card p-4 scanlines flex justify-center">
+            <SkillRadar skills={skills} size={180} />
+          </div>
+
+          {/* Next Goal CTA */}
+          <button onClick={() => setActiveTab('missions')} className="w-full neon-card p-4 text-left transition-all hover:border-plasma-cyan/40">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{
+                background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(178, 75, 243, 0.15))',
+              }}>
+                <span className="text-xl">🎯</span>
+              </div>
+              <div>
+                <h3 className="text-sm font-bold" style={{ color: '#E8F0FE' }}>{t('nextGoal')}</h3>
+                <p className="text-xs" style={{ color: '#A0AAB8' }}>
+                  {t('nextGoalDesc').replace('{xp}', String(xpNeeded)).replace('{level}', String(level + 1))}
+                </p>
+              </div>
+            </div>
+          </button>
+
           <DailyBonus studentId={sid} currentStreak={streak} lastBonusDate={lastBonusDate} onBonusClaimed={refetch} />
+
+          {/* Career Test */}
           <button onClick={() => setShowCareerTest(true)} className="w-full neon-card p-4 text-left">
             <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 212, 255, 0.15))',
-                }}
-              >
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-3xl" style={{
+                background: 'linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 212, 255, 0.15))',
+              }}>
                 🧭
               </div>
               <div>
                 <h3 className="font-bold">{t('careerTitle')}</h3>
-                <p className="text-sm text-cosmic-silver">{t('careerBasedOn')}</p>
+                <p className="text-sm" style={{ color: '#A0AAB8' }}>{t('careerBasedOn')}</p>
               </div>
             </div>
           </button>

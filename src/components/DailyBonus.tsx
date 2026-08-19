@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { t, getLocale } from '../lib/i18n'
+import { t } from '../lib/i18n'
 import { claimDailyBonus } from '../lib/currency'
 
 interface DailyBonusProps {
@@ -13,7 +13,6 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ xp: number; coins: number; streak: number; comebackBonus: boolean; streakFreezeUsed: boolean } | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const lang = getLocale()
 
   const today = new Date().toISOString().split('T')[0]
   const alreadyClaimed = lastBonusDate === today
@@ -58,7 +57,7 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
             border: '1px solid rgba(178, 75, 243, 0.3)',
             color: '#B24BF3',
           }}>
-            🎉 {lang === 'ru' ? 'Бонус возвращения! 2x XP' : 'Comeback Bonus! 2x XP'}
+            🎉 {t('dailyBonusComeback')}
           </div>
         )}
         {result.streakFreezeUsed && (
@@ -67,7 +66,7 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
             border: '1px solid rgba(0, 212, 255, 0.3)',
             color: '#00D4FF',
           }}>
-            🧊 {lang === 'ru' ? 'Заморозка серии использована!' : 'Streak Freeze used!'}
+            🧊 {t('dailyBonusStreakFreezeUsed')}
           </div>
         )}
         <div className="flex justify-center gap-8 mb-4">
@@ -87,6 +86,8 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
     )
   }
 
+  const effectiveStreak = currentStreak % 7
+
   return (
     <div className={`neon-card p-6 scanlines ${alreadyClaimed ? '' : 'neon-glow-orange'}`}>
       <div className="text-center">
@@ -105,30 +106,49 @@ export function DailyBonus({ studentId, currentStreak, lastBonusDate, onBonusCla
           </div>
         </div>
 
+        {/* Connected day track */}
         <div className="mb-5">
-          <div className="flex justify-center gap-1.5">
-            {[1, 2, 3, 4, 5, 6, 7].map((day) => {
-              const isCompleted = day <= currentStreak
-              return (
-                <div
-                  key={day}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all"
-                  style={{
-                    background: isCompleted
-                      ? 'linear-gradient(135deg, #FF9100, #FFD740)'
-                      : 'rgba(30, 37, 56, 0.8)',
-                    color: isCompleted ? '#0A0E1A' : '#8B95A8',
-                    border: `2px solid ${isCompleted ? '#FF9100' : '#2E354880'}`,
-                    boxShadow: isCompleted ? '0 0 10px rgba(255, 145, 0, 0.3)' : 'none',
-                  }}
-                >
-                  {day}
-                </div>
-              )
-            })}
+          <div className="relative flex justify-center items-center" style={{ minHeight: 48 }}>
+            {/* Connector line behind circles */}
+            <div className="absolute left-0 right-0 flex items-center justify-center px-6" style={{ height: 2, background: 'rgba(30, 37, 56, 0.8)' }}>
+              <div className="h-full rounded-full transition-all duration-500" style={{
+                width: `${Math.min(effectiveStreak / 7 * 100, 100)}%`,
+                maxWidth: 'calc(100% - 48px)',
+                background: 'linear-gradient(90deg, #FF9100, #FFD740)',
+                boxShadow: effectiveStreak > 0 ? '0 0 8px rgba(255, 145, 0, 0.4)' : 'none',
+              }} />
+            </div>
+
+            <div className="relative flex justify-center gap-1.5">
+              {[1, 2, 3, 4, 5, 6, 7].map((day) => {
+                const isCompleted = day <= effectiveStreak
+                const isCurrent = day === effectiveStreak + 1 && !alreadyClaimed
+                const isDay7 = day === 7
+
+                return (
+                  <div
+                    key={day}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${isCurrent ? 'day-current-pulse' : ''}`}
+                    style={{
+                      background: isCompleted
+                        ? 'linear-gradient(135deg, #FF9100, #FFD740)'
+                        : isCurrent
+                          ? 'linear-gradient(135deg, rgba(255, 145, 0, 0.3), rgba(255, 215, 64, 0.3))'
+                          : 'rgba(30, 37, 56, 0.8)',
+                      color: isCompleted ? '#0A0E1A' : isCurrent ? '#FFD740' : '#8B95A8',
+                      border: `2px solid ${isCompleted ? '#FF9100' : isCurrent ? 'rgba(255, 145, 0, 0.5)' : isDay7 ? 'rgba(178, 75, 243, 0.4)' : '#2E354880'}`,
+                      boxShadow: isCompleted ? '0 0 10px rgba(255, 145, 0, 0.3)' : 'none',
+                      transform: isDay7 && !isCompleted ? 'scale(1.1)' : undefined,
+                    }}
+                  >
+                    {isDay7 ? '💎' : day}
+                  </div>
+                )
+              })}
+            </div>
           </div>
           <div className="text-xs text-cosmic-silver mt-2 font-mono">
-            {t('dailyBonusDay7')}
+            {t('dailyBonusDay7Special')}
           </div>
         </div>
 

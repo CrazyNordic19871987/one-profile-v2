@@ -9,6 +9,7 @@ interface SkillRadarProps {
 }
 
 export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarProps) {
+  const hasAnyXp = skills.some(s => s.xp > 0)
   const center = size / 2
   const maxRadius = size / 2 - 20
 
@@ -16,20 +17,32 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
     return DIRECTIONS.map((dir, i) => {
       const skill = skills.find(s => s.direction === dir.id)
       const xp = skill?.xp || 0
-      const value = Math.min(xp / 500, 1)
+      const value = hasAnyXp ? Math.min(xp / 500, 1) : 0
       const angle = (i / DIRECTIONS.length) * 2 * Math.PI - Math.PI / 2
       const x = center + Math.cos(angle) * maxRadius * value
       const y = center + Math.sin(angle) * maxRadius * value
       return { x, y, dir, value }
     })
-  }, [skills, center, maxRadius])
+  }, [skills, center, maxRadius, hasAnyXp])
 
   const gridLevels = [0.25, 0.5, 0.75, 1]
+
+  if (!hasAnyXp) {
+    return (
+      <div className={`radar-empty-shimmer rounded-xl p-6 text-center ${className}`} style={{
+        background: 'linear-gradient(135deg, rgba(18, 24, 43, 0.6), rgba(30, 37, 56, 0.4))',
+        border: '1px dashed rgba(0, 212, 255, 0.2)',
+      }}>
+        <div className="text-4xl mb-3 opacity-40">🕸️</div>
+        <p className="text-sm font-bold text-cosmic-silver mb-1">Навыки закрыты</p>
+        <p className="text-xs opacity-50">Пройди первую миссию, чтобы открыть навыки</p>
+      </div>
+    )
+  }
 
   return (
     <div className={`relative ${className}`}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {/* Grid circles */}
         {gridLevels.map((level) => (
           <circle
             key={level}
@@ -42,7 +55,6 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
           />
         ))}
 
-        {/* Grid lines */}
         {DIRECTIONS.map((_, i) => {
           const angle = (i / DIRECTIONS.length) * 2 * Math.PI - Math.PI / 2
           const x = center + Math.cos(angle) * maxRadius
@@ -60,7 +72,6 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
           )
         })}
 
-        {/* Data polygon */}
         <polygon
           points={points.map(p => `${p.x},${p.y}`).join(' ')}
           fill="rgba(0, 212, 255, 0.2)"
@@ -68,7 +79,6 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
           strokeWidth="2"
         />
 
-        {/* Data points */}
         {points.map((p, i) => (
           <circle
             key={i}
@@ -81,7 +91,6 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
           />
         ))}
 
-        {/* Direction labels */}
         {DIRECTIONS.map((dir, i) => {
           const angle = (i / DIRECTIONS.length) * 2 * Math.PI - Math.PI / 2
           const labelRadius = maxRadius + 15
@@ -103,7 +112,6 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
         })}
       </svg>
 
-      {/* Legend */}
       <div className="mt-2 grid grid-cols-2 gap-1 text-xs">
         {DIRECTIONS.map((dir) => {
           const skill = skills.find(s => s.direction === dir.id)
@@ -114,8 +122,8 @@ export function SkillRadar({ skills, size = 200, className = '' }: SkillRadarPro
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: dir.color }}
               />
-              <span className="text-cosmic-silver">{dir.icon}</span>
-              <span className="font-mono">{xp}</span>
+              <span className="text-cosmic-silver">{dir.icon} {dir.name}</span>
+              <span className="font-mono ml-auto">{xp}</span>
             </div>
           )
         })}
