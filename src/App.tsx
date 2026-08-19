@@ -61,16 +61,6 @@ function App() {
   const moreDrawerRef = useRef<HTMLDivElement>(null)
   const badgesEvaluatedRef = useRef(false)
 
-  const handleLangChange = (newLang: Locale) => {
-    setLang(newLang)
-    setLocale(newLang)
-  }
-
-  // Auth gate: show auth screen if not logged in
-  if (!loading && !user) {
-    return <AuthScreen onAuth={() => refetch()} />
-  }
-
   const totalXp = student?.total_xp || 0
   const level = levelFromXp(totalXp)
   const xpInCurrent = xpInLevel(totalXp)
@@ -83,6 +73,26 @@ function App() {
   const lastBonusDate = student?.last_bonus_date || null
   const prestigeCount = student?.prestige_count || 0
   const currentPerks = student?.perks || []
+  const sid = studentId!
+
+  // Evaluate badges on load (once per session)
+  useEffect(() => {
+    if (badgesEvaluatedRef.current || !sid) return
+    badgesEvaluatedRef.current = true
+    evaluateBadges(sid).then(newBadges => {
+      newBadges.forEach(name => addNotification('success', `${lang === 'ru' ? 'Бейдж получен' : 'Badge earned'}: ${name}`))
+    }).catch(() => {})
+  }, [sid])
+
+  const handleLangChange = (newLang: Locale) => {
+    setLang(newLang)
+    setLocale(newLang)
+  }
+
+  // Auth gate: show auth screen if not logged in
+  if (!loading && !user) {
+    return <AuthScreen onAuth={() => refetch()} />
+  }
 
   if (showTutorial) return <TutorialSystem onComplete={() => setShowTutorial(false)} />
 
@@ -136,17 +146,7 @@ function App() {
     )
   }
 
-  const sid = studentId!
   const s = student!
-
-  // Evaluate badges on load (once per session)
-  useEffect(() => {
-    if (badgesEvaluatedRef.current || !sid) return
-    badgesEvaluatedRef.current = true
-    evaluateBadges(sid).then(newBadges => {
-      newBadges.forEach(name => addNotification('success', `${lang === 'ru' ? 'Бейдж получен' : 'Badge earned'}: ${name}`))
-    }).catch(() => {})
-  }, [sid])
 
   function renderContent() {
     switch (activeTab) {
